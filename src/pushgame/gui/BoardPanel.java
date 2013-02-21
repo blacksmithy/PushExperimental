@@ -26,9 +26,11 @@ public class BoardPanel extends JPanel {
 	 * Default constructor. Sets default size (512x512) and background color (white).
 	 */
 	public BoardPanel() {
+		super();
 		this.setSize(512, 512);
 		this.setBackground(Color.WHITE);
 		this.board = null;
+		this.setVisible(true);
 	}
 	
 	/**

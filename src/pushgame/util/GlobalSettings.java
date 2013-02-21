@@ -14,8 +14,6 @@ public class GlobalSettings {
 	/*
 	 * GUI
 	 */
-	public static final char GUI_WHITE_DRAUGHTS_MAN = '\u26c0';
-	public static final char GUI_BLACK_DRAUGHTS_MAN = '\u26c2';
 	public static final int GUI_BOARD_PANEL_SIZE = 512;
 	public static final int GUI_BOARD_FIELD_SIZE = 64;
 	public static final int GUI_BOARD_CHECKER_SIZE = 50;

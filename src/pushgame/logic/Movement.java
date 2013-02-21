@@ -34,14 +34,6 @@ public class Movement {
 			* GlobalSettings.BOARD_SIZE;
 
 
-//	public Movement(byte from, byte to, byte angle, byte chainNum) {
-//		origin = from;
-//		destination = to;
-//		this.angle = angle;
-//		chain = chainNum;
-//		distance = 1;
-//	}
-
 	public Movement(byte from, byte distance, byte angle, byte chainNum) {
 		origin = from;
 		this.angle = angle;

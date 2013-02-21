@@ -12,6 +12,7 @@ public class Game {
 	private Player player2;
 	private BoardPanel boardPanel;
 	private GameWindow window;
+	private static final long PLAYER_SLEEP = 0L;
 
 	public Game(Player player1, Player player2, GameWindow gameWindow) { // BoardPanel boardPanel
 		this.player1 = player1;
@@ -27,7 +28,6 @@ public class Game {
 		Movement move = null;
 		long start, end;
 		byte winner = 0;
-		int i = 30000;
 		while ((winner = board.getWinner()) == 0) {
 			System.out.println("P1 @ " + new Date());
 			start = System.nanoTime();
@@ -36,43 +36,34 @@ public class Game {
 			System.out.println("P1 \"thinking\" time: " + ((end - start)) + "ns");
 
 			board.makeMove(move);
+			boardPanel.getParent().repaint();
 			
-			//boardPanel.refreshState();
-			//window.refreshBoard();
-			window.repaint();
+			window.refreshBoard();
 			
 			if (board.getWinner() != 0)
 				break;
 			
-//			try {
-//				Thread.sleep(1000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
+			try {
+				Thread.sleep(PLAYER_SLEEP);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			
 			System.out.println("P2 @ " + new Date());
 			start = System.nanoTime();
 			move = player2.makeMove(board);
 			end = System.nanoTime();
 			System.out.println("P2 \"thinking\" time: " + ((end - start)) + "ns");
-			// TODO make move here like board.makeMove(move)
 			
 			board.makeMove(move);
 			
-			//boardPanel.refreshState();
-			//window.refreshBoard();
-			window.repaint();
+			window.refreshBoard();
 			
-//			try {
-//				Thread.sleep(1000);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-
-
-			if (i == 0)
-				break;
-			--i;
+			try {
+				Thread.sleep(PLAYER_SLEEP);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		System.out.println("And the winner is... PLAYER" + winner + "!");
 	}
