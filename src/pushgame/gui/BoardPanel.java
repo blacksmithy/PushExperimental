@@ -89,20 +89,20 @@ public class BoardPanel extends JPanel {
 	
 	
 	/**
-	 * Draws checker on the board.
+	 * Draws pawn on the board.
 	 * @param g Graphics2D object to draw.
 	 * @param color Checker's color.
 	 * @param row Checker's position in row.
 	 * @param column Checker's position in column.
 	 */
-	protected void drawChecker(Graphics2D g, Color color, int row, int column) {
+	protected void drawPawn(Graphics2D g, Color color, int row, int column) {
 		int size = GlobalSettings.GUI_BOARD_FIELD_SIZE;
-		int checkerSize = GlobalSettings.GUI_BOARD_CHECKER_SIZE;
-		int offset = (size - checkerSize) / 2;
+		int pawnSize = GlobalSettings.GUI_BOARD_PAWN_SIZE;
+		int offset = (size - pawnSize) / 2;
 		g.setColor(Color.black);
-		g.fillOval(column * size + offset, row * size + offset, checkerSize, checkerSize);
+		g.fillOval(column * size + offset, row * size + offset, pawnSize, pawnSize);
 		g.setColor(color);
-		g.fillOval(column * size + offset + 3, row * size + offset + 3, checkerSize-6, checkerSize-6);
+		g.fillOval(column * size + offset + 3, row * size + offset + 3, pawnSize-6, pawnSize-6);
 	}
 	
 	
@@ -118,9 +118,9 @@ public class BoardPanel extends JPanel {
 			for (byte j = 0; j < GlobalSettings.BOARD_SIZE; ++j) {
 				if ((val = board.get(i, j)) != 0) {
 					if (val == GlobalSettings.PLAYER_1_ID)
-						drawChecker(g, Color.blue, i, j);
+						drawPawn(g, Color.blue, i, j);
 					else
-						drawChecker(g, Color.red, i, j);
+						drawPawn(g, Color.red, i, j);
 				}
 			}
 		}

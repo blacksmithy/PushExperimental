@@ -39,7 +39,7 @@ public class InteractiveBoardPanel extends BoardPanel implements MouseListener
 		if(posibleDest!=null)
 		{
 			int size = GlobalSettings.GUI_BOARD_FIELD_SIZE;
-			int checkerSize = GlobalSettings.GUI_BOARD_CHECKER_SIZE;
+			int checkerSize = GlobalSettings.GUI_BOARD_FIELD_SIZE-6;
 			int offset = (size - checkerSize) / 2;
 			
 			for(int i=0;i<posibleDest.size();i++)
@@ -47,7 +47,7 @@ public class InteractiveBoardPanel extends BoardPanel implements MouseListener
 				int row=posibleDest.get(i)/GlobalSettings.BOARD_SIZE;
 				int col=posibleDest.get(i)%GlobalSettings.BOARD_SIZE;
 				g.setColor(Color.orange);
-				g.fillOval(col * size + offset, row * size + offset, checkerSize, checkerSize);
+				g.fillRect(col * size + offset, row * size + offset, checkerSize, checkerSize);
 			}
 		}
 	}

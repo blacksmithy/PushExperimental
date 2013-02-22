@@ -10,12 +10,16 @@ import pushgame.util.GlobalSettings;
 
 public class HumanPlayer extends Player {
 
-	FieldObserver obs;
+	BoardObserver obs;
 
 	public HumanPlayer(byte id, int delay) {
 		super(id, delay);
-		obs=new FieldObserver(id);
-		// TODO Auto-generated constructor stub
+	}
+
+
+	public FieldListener getListener() {
+		obs=new BoardObserver(id);
+		return obs;
 	}
 
 	@Override
@@ -23,28 +27,16 @@ public class HumanPlayer extends Player {
 		obs.init(board);
 		obs.start();
 		
-		try
-		{
-			obs.join();
-		}
+		try {obs.join();}
 		catch (InterruptedException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("joined");
+		{e.printStackTrace();}
+
 		return obs.result;
-	}
-
-
-	public FieldListener getListener() {
-		obs=new FieldObserver(id);
-		return obs;
 	}
 
 }
 
-class FieldObserver extends Thread implements FieldListener
+class BoardObserver extends Thread implements FieldListener
 {
 	byte id;
 	boolean active=true;
@@ -54,7 +46,7 @@ class FieldObserver extends Thread implements FieldListener
 	List<Byte> dests=null;
 	Movement result=null;
 	
-	public FieldObserver(byte id)
+	public BoardObserver(byte id)
 	{
 		super();
 		currField=null;

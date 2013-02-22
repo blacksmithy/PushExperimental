@@ -16,7 +16,7 @@ public class GlobalSettings {
 	 */
 	public static final int GUI_BOARD_PANEL_SIZE = 512;
 	public static final int GUI_BOARD_FIELD_SIZE = 64;
-	public static final int GUI_BOARD_CHECKER_SIZE = 50;
+	public static final int GUI_BOARD_PAWN_SIZE = 50;
 	public static final Color GUI_FIELD_COLOR = new Color(207, 231, 245, 255);
 	
 	
