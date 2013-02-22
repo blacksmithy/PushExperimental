@@ -131,7 +131,7 @@ public class Board {
 	 *            <li><b>player's id</b> => sets player's checker.</li>
 	 *            </ul>
 	 */
-	public void set(byte row, byte column, byte value) {
+	protected void set(byte row, byte column, byte value) {
 		if (value == 0) {
 			player1Board = player1Board
 					& fieldsMasksZero[fieldsNums[row][column]];
@@ -156,7 +156,7 @@ public class Board {
 	 *            <li><b>player's id</b> => sets player's checker.</li>
 	 *            </ul>
 	 */
-	public void set(byte field, byte value) {
+	protected void set(byte field, byte value) {
 		if (value == 0) {
 			player1Board = player1Board & fieldsMasksZero[field];
 			player2Board = player2Board & fieldsMasksZero[field];
@@ -209,13 +209,13 @@ public class Board {
 	 *            Angle of the move.
 	 * @return Number of pushed checkers.
 	 */
-	public byte getChainLength(byte field, byte angle) {
+	protected byte getChainLength(byte field, byte angle) {
 		byte chainLength = 0;
 		byte value = get(field);
 		byte curr = field;
 		byte prev = field;
-		// 7 | 0 | 1 
-		// 6 | X | 2 
+		// 7 | 0 | 1
+		// 6 | X | 2
 		// 5 | 4 | 3
 		switch (angle) {
 		/* ******** angle == 0 ******** */
@@ -388,7 +388,7 @@ public class Board {
 	 *            Angle of empty fields searching.
 	 * @return Number of empty fields
 	 */
-	public byte countNextEmptyFields(byte field, byte angle) {
+	protected byte countNextEmptyFields(byte field, byte angle) {
 		byte count = 0;
 		byte curr = field;
 		byte prev = field;
@@ -474,7 +474,7 @@ public class Board {
 				curr = (byte) (curr - 1);
 			}
 			break;
-			
+
 		case 7:
 			curr = (byte) (prev - 9);
 			while (curr >= 0 && (curr / 8) == ((prev / 8) - 1) && count < 3) {
@@ -499,7 +499,7 @@ public class Board {
 	 *            Player's id.
 	 * @return List of all possible moves.
 	 */
-	public List<Movement> getPossibleMoves2(byte player) {
+	public List<Movement> getPossibleMovesAll(byte player) {
 		List<Movement> moves = new ArrayList<Movement>();
 		byte temp = 0;
 		byte chain = 0;
@@ -532,7 +532,7 @@ public class Board {
 					} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
 						empty = countNextEmptyFields(i, (byte) 0);
 						for (byte dist = 1; dist <= empty; ++dist) {
-							moves.add(new Movement(i, dist, (byte) 0, (byte)0));
+							moves.add(new Movement(i, dist, (byte) 0, (byte) 0));
 						}
 					}
 				}
@@ -553,7 +553,7 @@ public class Board {
 					} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
 						empty = countNextEmptyFields(i, (byte) 1);
 						for (byte dist = 1; dist <= empty; ++dist) {
-							moves.add(new Movement(i, dist, (byte) 1, (byte)0));
+							moves.add(new Movement(i, dist, (byte) 1, (byte) 0));
 						}
 					}
 				}
@@ -575,7 +575,7 @@ public class Board {
 					} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
 						empty = countNextEmptyFields(i, (byte) 2);
 						for (byte dist = 1; dist <= empty; ++dist) {
-							moves.add(new Movement(i, dist, (byte) 2, (byte)0));
+							moves.add(new Movement(i, dist, (byte) 2, (byte) 0));
 						}
 					}
 				}
@@ -598,7 +598,7 @@ public class Board {
 					} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
 						empty = countNextEmptyFields(i, (byte) 3);
 						for (byte dist = 1; dist <= empty; ++dist) {
-							moves.add(new Movement(i, dist, (byte) 3, (byte)0));
+							moves.add(new Movement(i, dist, (byte) 3, (byte) 0));
 						}
 					}
 				}
@@ -621,7 +621,7 @@ public class Board {
 					} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
 						empty = countNextEmptyFields(i, (byte) 4);
 						for (byte dist = 1; dist <= empty; ++dist) {
-							moves.add(new Movement(i, dist, (byte) 4, (byte)0));
+							moves.add(new Movement(i, dist, (byte) 4, (byte) 0));
 						}
 					}
 				}
@@ -643,7 +643,7 @@ public class Board {
 					} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
 						empty = countNextEmptyFields(i, (byte) 5);
 						for (byte dist = 1; dist <= empty; ++dist) {
-							moves.add(new Movement(i, dist, (byte) 5, (byte)0));
+							moves.add(new Movement(i, dist, (byte) 5, (byte) 0));
 						}
 					}
 				}
@@ -666,7 +666,7 @@ public class Board {
 					} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
 						empty = countNextEmptyFields(i, (byte) 6);
 						for (byte dist = 1; dist <= empty; ++dist) {
-							moves.add(new Movement(i, dist, (byte) 6, (byte)0));
+							moves.add(new Movement(i, dist, (byte) 6, (byte) 0));
 						}
 					}
 				}
@@ -688,7 +688,7 @@ public class Board {
 					} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
 						empty = countNextEmptyFields(i, (byte) 7);
 						for (byte dist = 1; dist <= empty; ++dist) {
-							moves.add(new Movement(i, dist, (byte) 7, (byte)0));
+							moves.add(new Movement(i, dist, (byte) 7, (byte) 0));
 						}
 					}
 				}
@@ -698,15 +698,17 @@ public class Board {
 		Collections.shuffle(moves);
 		return moves;
 	}
-	
+
 	/**
-	 * Returns list of all possible moves (Movement objects) for given player.
+	 * Returns list of possible moves (Movement objects) for given player<br>
+	 * with priorities for directions:<br>
+	 * <i> forward -> inline -> backward</i><br>
+	 * <b>Returns only moves in one, chosen (by priorities) direction!</b>
 	 * 
 	 * @param player
 	 *            Player's id.
 	 * @return List of all possible moves.
 	 */
-	// TODO
 	public List<Movement> getPossibleMoves(byte player) {
 		List<Movement> moves = new ArrayList<Movement>();
 		byte temp = 0;
@@ -790,15 +792,19 @@ public class Board {
 							}
 
 							/* ************************************************** */
-							
-							/* ******************* angle == 5 ******************* */
+
+							/*
+							 *  ******************* angle == 5
+							 * *******************
+							 */
 							temp = (byte) ((byte) i + 7);
 							if (temp < 64) {
 								if ((playerBoard & fieldsMasks[temp]) != 0) {
 									chain = getChainLength(i, (byte) 5);
 									if (chain != 0) {
 										empty = countNextEmptyFields(
-												(byte) (i + (7 * chain)), (byte) 5);
+												(byte) (i + (7 * chain)),
+												(byte) 5);
 										for (byte dist = 1; dist <= empty; ++dist) {
 											moves.add(new Movement(i, dist,
 													(byte) 5, chain));
@@ -807,8 +813,8 @@ public class Board {
 								} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
 									empty = countNextEmptyFields(i, (byte) 5);
 									for (byte dist = 1; dist <= empty; ++dist) {
-										moves.add(new Movement(i, dist, (byte) 5,
-												(byte) 0));
+										moves.add(new Movement(i, dist,
+												(byte) 5, (byte) 0));
 									}
 								}
 							}
@@ -939,7 +945,7 @@ public class Board {
 
 				}
 			}
-			//System.out.println("STAGE=" + stage);
+			// System.out.println("STAGE=" + stage);
 			++stage;
 
 		}
@@ -947,112 +953,128 @@ public class Board {
 		return moves;
 	}
 
-	
+	/**
+	 * Makes move on board.
+	 * 
+	 * @param move
+	 *            Move to make.
+	 */
 	public void makeMove(Movement move) {
 		int originVal = get(move.getOrigin());
-		
+
 		if (move.chain == 0) {
 			if (originVal == player1) {
 				player1Board = player1Board & fieldsMasksZero[move.origin];
 				player1Board = player1Board | fieldsMasks[move.destination];
-			}
-			else {
+			} else {
 				player2Board = player2Board & fieldsMasksZero[move.origin];
 				player2Board = player2Board | fieldsMasks[move.destination];
 			}
 			return;
 		}
-		
+
 		long playerBoard = 0;
 		if (originVal == player1)
 			playerBoard = player1Board;
 		else
 			playerBoard = player2Board;
 
-			byte tempFrom = 0;
-			byte tempTo = 0;
-			switch (move.getAngle()) {
-			
-			case 0:
-				for (byte i = move.chain; i > 0; --i) {
-					tempFrom = (byte) (move.origin - (i * 8));
-					tempTo = (byte) (move.destination - (i * 8));
-					playerBoard = playerBoard & fieldsMasksZero[tempFrom];
-					playerBoard = playerBoard | fieldsMasks[tempTo];
-				}
-				break;
-				
-			case 1:
-				for (byte i = move.chain; i > 0; --i) {
-					tempFrom = (byte) (move.origin - (i * 7));
-					tempTo = (byte) (move.destination - (i * 7));
-					playerBoard = playerBoard & fieldsMasksZero[tempFrom];
-					playerBoard = playerBoard | fieldsMasks[tempTo];
-				}
-				break;
+		byte tempFrom = 0;
+		byte tempTo = 0;
+		switch (move.getAngle()) {
 
-				
-			case 2:
-				for (byte i = move.chain; i > 0; --i) {
-					tempFrom = (byte) (move.origin + i);
-					tempTo = (byte) (move.destination + i);
-					playerBoard = playerBoard & fieldsMasksZero[tempFrom];
-					playerBoard = playerBoard | fieldsMasks[tempTo];
-				}
-				break;
-				
-			case 3:
-				for (byte i = move.chain; i > 0; --i) {
-					tempFrom = (byte) (move.origin + (i * 9));
-					tempTo = (byte) (move.destination + (i * 9));
-					playerBoard = playerBoard & fieldsMasksZero[tempFrom];
-					playerBoard = playerBoard | fieldsMasks[tempTo];
-				}
-				break;
-				
-			case 4:
-				for (byte i = move.chain; i > 0; --i) {
-					tempFrom = (byte) (move.origin + (i * 8));
-					tempTo = (byte) (move.destination + (i * 8));
-					playerBoard = playerBoard & fieldsMasksZero[tempFrom];
-					playerBoard = playerBoard | fieldsMasks[tempTo];
-				}
-				break;
-				
-			case 5:
-				for (byte i = move.chain; i > 0; --i) {
-					tempFrom = (byte) (move.origin + (i * 7));
-					tempTo = (byte) (move.destination + (i * 7));
-					playerBoard = playerBoard & fieldsMasksZero[tempFrom];
-					playerBoard = playerBoard | fieldsMasks[tempTo];
-				}
-				break;
-
-			case 6:
-				for (byte i = move.chain; i > 0; --i) {
-					tempFrom = (byte) (move.origin - i);
-					tempTo = (byte) (move.destination - i);
-					playerBoard = playerBoard & fieldsMasksZero[tempFrom];
-					playerBoard = playerBoard | fieldsMasks[tempTo];
-				}
-				break;
-				
-				
-			case 7:
-				for (byte i = move.chain; i > 0; --i) {
-					tempFrom = (byte) (move.origin - (i * 9));
-					tempTo = (byte) (move.destination - (i * 9));
-					playerBoard = playerBoard & fieldsMasksZero[tempFrom];
-					playerBoard = playerBoard | fieldsMasks[tempTo];
-				}
-				break;
+		case 0:
+			for (byte i = move.chain; i > 0; --i) {
+				tempFrom = (byte) (move.origin - (i * 8));
+				tempTo = (byte) (move.destination - (i * 8));
+				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
+				playerBoard = playerBoard | fieldsMasks[tempTo];
 			}
-			playerBoard = playerBoard & fieldsMasksZero[move.origin];
-			playerBoard = playerBoard | fieldsMasks[move.destination];
-			
-			if (originVal == player1)
-				player1Board = playerBoard;
-			else
-				player2Board = playerBoard;
+			break;
+
+		case 1:
+			for (byte i = move.chain; i > 0; --i) {
+				tempFrom = (byte) (move.origin - (i * 7));
+				tempTo = (byte) (move.destination - (i * 7));
+				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
+				playerBoard = playerBoard | fieldsMasks[tempTo];
+			}
+			break;
+
+		case 2:
+			for (byte i = move.chain; i > 0; --i) {
+				tempFrom = (byte) (move.origin + i);
+				tempTo = (byte) (move.destination + i);
+				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
+				playerBoard = playerBoard | fieldsMasks[tempTo];
+			}
+			break;
+
+		case 3:
+			for (byte i = move.chain; i > 0; --i) {
+				tempFrom = (byte) (move.origin + (i * 9));
+				tempTo = (byte) (move.destination + (i * 9));
+				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
+				playerBoard = playerBoard | fieldsMasks[tempTo];
+			}
+			break;
+
+		case 4:
+			for (byte i = move.chain; i > 0; --i) {
+				tempFrom = (byte) (move.origin + (i * 8));
+				tempTo = (byte) (move.destination + (i * 8));
+				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
+				playerBoard = playerBoard | fieldsMasks[tempTo];
+			}
+			break;
+
+		case 5:
+			for (byte i = move.chain; i > 0; --i) {
+				tempFrom = (byte) (move.origin + (i * 7));
+				tempTo = (byte) (move.destination + (i * 7));
+				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
+				playerBoard = playerBoard | fieldsMasks[tempTo];
+			}
+			break;
+
+		case 6:
+			for (byte i = move.chain; i > 0; --i) {
+				tempFrom = (byte) (move.origin - i);
+				tempTo = (byte) (move.destination - i);
+				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
+				playerBoard = playerBoard | fieldsMasks[tempTo];
+			}
+			break;
+
+		case 7:
+			for (byte i = move.chain; i > 0; --i) {
+				tempFrom = (byte) (move.origin - (i * 9));
+				tempTo = (byte) (move.destination - (i * 9));
+				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
+				playerBoard = playerBoard | fieldsMasks[tempTo];
+			}
+			break;
+		}
+		playerBoard = playerBoard & fieldsMasksZero[move.origin];
+		playerBoard = playerBoard | fieldsMasks[move.destination];
+
+		if (originVal == player1)
+			player1Board = playerBoard;
+		else
+			player2Board = playerBoard;
 	}
+
+	/**
+	 * Returns copy of current board after chosen move.
+	 * 
+	 * @param move
+	 *            Move to make.
+	 * @return Board copy after move.
+	 */
+	public Board getBoardCopyAfterMove(Movement move) {
+		Board board = new Board(this);
+		board.makeMove(move);
+		return board;
+	}
+
 }

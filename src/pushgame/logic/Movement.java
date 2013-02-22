@@ -34,6 +34,13 @@ public class Movement {
 			* GlobalSettings.BOARD_SIZE;
 
 
+	/**
+	 * Movement constructor. Computes destination field from given values.
+	 * @param from
+	 * @param distance
+	 * @param angle
+	 * @param chainNum
+	 */
 	public Movement(byte from, byte distance, byte angle, byte chainNum) {
 		origin = from;
 		this.angle = angle;
@@ -81,47 +88,84 @@ public class Movement {
 	}
 
 	
+	/**
+	 * Checks if the move is valid (checking all it's parameters).<br>
+	 * By default movements <b>are not</b> prevented from being invalid.<br>
+	 * <i>Most often there is no need to check it (they are checked in places<br>
+	 * where the are creating).</i>
+	 * @return True if movement is valid. False if movement is not valid.
+	 */
+	public boolean isValid() {
+		if (origin >= 0 && origin < 64 && destination >= 0 && destination < 64
+				&& distance > 0 && distance < 4)
+			return true;
+		return false;
+	}
 	
+	/**
+	 * Returns origin field of movement.
+	 * @return Origin field.
+	 */
 	public byte getOrigin() {
 		return origin;
 	}
 
 
-
+	/**
+	 * Returns destination field of movement.
+	 * @return Destination field.
+	 */
 	public byte getDestination() {
 		return destination;
 	}
 
 
-
+	/**
+	 * Returns distance of the move.
+	 * @return Movement's <1, 3>.
+	 */
 	public byte getDistance() {
 		return distance;
 	}
 
 
-
+	/**
+	 * Returns angle of movement. Values:<br>
+	 * 7 | 0 | 1 <br>
+	 * 6 | X | 2 <br>
+	 * 5 | 4 | 3
+	 * @return Movement's angle.
+	 */
 	public byte getAngle() {
 		return angle;
 	}
 
 
-
+	/**
+	 * Returns chain length - number of checkers to be pushed in this move.
+	 * @return Chain length.
+	 */
 	public byte getChain() {
 		return chain;
 	}
 
 
-
+	/**
+	 * Returns board size.
+	 * @return Board size.
+	 */
 	public static byte getBoardSize() {
 		return boardSize;
 	}
 
 
-
+	/**
+	 * Returns square of board size.
+	 * @return Board size ^ 2.
+	 */
 	public static byte getBoardSizeSize() {
 		return boardSizeSize;
 	}
-
 
 
 	@Override
