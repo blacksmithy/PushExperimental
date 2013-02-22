@@ -1,9 +1,12 @@
 package pushgame.players;
 
+import java.util.List;
+
+import pushgame.gui.FieldListener;
 import pushgame.logic.Board;
 import pushgame.logic.Movement;
 
-public abstract class Player {
+public abstract class Player implements FieldListener {
 
 	protected byte id;
 	protected int delay;
@@ -29,5 +32,12 @@ public abstract class Player {
 
 	public void setDelay(int delay) {
 		this.delay = delay;
+	}
+	
+	public List<Byte> fieldClicked(byte row,byte col,byte op) {
+		return null;
+	}
+	public FieldListener getListener() {
+		return this;
 	}
 }

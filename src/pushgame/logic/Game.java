@@ -2,15 +2,15 @@ package pushgame.logic;
 
 import java.util.Date;
 
-import pushgame.gui.BoardPanel;
 import pushgame.gui.GameWindow;
+import pushgame.gui.InteractiveBoardPanel;
 import pushgame.players.Player;
 
 public class Game {
 	
 	private Player player1;
 	private Player player2;
-	private BoardPanel boardPanel;
+	private InteractiveBoardPanel boardPanel;
 	private GameWindow window;
 	private static final long PLAYER_SLEEP = 0L;
 
@@ -31,7 +31,11 @@ public class Game {
 		while ((winner = board.getWinner()) == 0) {
 			System.out.println("P1 @ " + new Date());
 			start = System.nanoTime();
+			
+			boardPanel.setFieldListener(player1);
 			move = player1.makeMove(board);
+			boardPanel.clearFieldListener();
+			
 			end = System.nanoTime();
 			System.out.println("P1 \"thinking\" time: " + ((end - start)) + "ns");
 
@@ -51,7 +55,11 @@ public class Game {
 			
 			System.out.println("P2 @ " + new Date());
 			start = System.nanoTime();
+			
+			boardPanel.setFieldListener(player2);
 			move = player2.makeMove(board);
+			boardPanel.clearFieldListener();
+			
 			end = System.nanoTime();
 			System.out.println("P2 \"thinking\" time: " + ((end - start)) + "ns");
 			

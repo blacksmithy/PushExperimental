@@ -13,7 +13,7 @@ public class GameWindow extends JFrame {
 	private static final long serialVersionUID = 5300634654382603624L;
 
 	private JPanel contentPane;
-	private BoardPanel boardPanel;
+	private InteractiveBoardPanel boardPanel;
 
 	/**
 	 * Create the frame.
@@ -28,7 +28,7 @@ public class GameWindow extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		boardPanel = new BoardPanel();
+		boardPanel = new InteractiveBoardPanel();
 		boardPanel.setBounds(34, 26, 512, 512);
 		contentPane.add(boardPanel);
 		
@@ -48,7 +48,7 @@ public class GameWindow extends JFrame {
 		
 	};
 	
-	public BoardPanel getBoardPanel() {
+	public InteractiveBoardPanel getBoardPanel() {
 		return this.boardPanel;
 	}
 
