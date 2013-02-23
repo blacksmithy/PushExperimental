@@ -1,7 +1,6 @@
 ﻿package pushgame.gui.windows;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -81,29 +80,27 @@ public class MainMenu extends JFrame implements ActionListener
 		{
 			GameWindow.startNewWindow();
 		}
-//		else if (src == editBoard)
-//		{
-//			new GameWindow(true);
-//		}
-//		else if (src == loadGame)
-//		{
-//			JFileChooser fs=new JFileChooser();
-//			int returnVal = fs.showOpenDialog(this);
-//
-//	        if (returnVal == JFileChooser.APPROVE_OPTION) {
-//	            File file = fs.getSelectedFile();
-//	            //Logic l=new Logic();
-//	            try
-//				{
-//					//l.loadFromFile(file.getPath());
-//					//new GameWindow(l);
-//				}
-//				catch (ClassNotFoundException | IOException e1)
-//				{
-//					JOptionPane.showMessageDialog(null,"Nie uda�o si� otworzy� gry.");
-//				}
-//	        }
-//		}
+		else if (src == editBoard)
+		{
+			GameWindow.launchEditMode();
+		}
+		else if (src == loadGame)
+		{
+			JFileChooser fs=new JFileChooser();
+			int returnVal = fs.showOpenDialog(this);
+
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            File file = fs.getSelectedFile();
+	            try
+				{
+	            	GameWindow.launchExistingGame(file.getPath());
+				}
+				catch (ClassNotFoundException | IOException e1)
+				{
+					JOptionPane.showMessageDialog(null,"Nie uda�o si� otworzy� gry.");
+				}
+	        }
+		}
 		else if (src == settings)
 		{
 			new SettingsWindow();

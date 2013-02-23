@@ -8,17 +8,17 @@ import pushgame.logic.Board;
 import pushgame.logic.Movement;
 import pushgame.util.GlobalSettings;
 
-public class HumanPlayer extends Player {
+public class BoardEditor extends Player {
 
-	BoardObserver obs;
+	EditObserver obs;
 
-	public HumanPlayer(byte id, int delay) {
-		super(id, 0);
+	public BoardEditor() {
+		super((byte) 1, 0);
 	}
 
 
 	public FieldListener getListener() {
-		obs=new BoardObserver(id);
+		obs=new EditObserver();
 		return obs;
 	}
 
@@ -31,35 +31,30 @@ public class HumanPlayer extends Player {
 		catch (InterruptedException e)
 		{e.printStackTrace();}
 
-		return obs.result;
+		return null;
 	}
 
 }
 
-class BoardObserver extends Thread implements FieldListener
+class EditObserver extends Thread implements FieldListener
 {
-	byte id;
 	boolean active=true;
 	Board currBoard;
 	Byte currField=null;
-	List <Movement> movs=null;
 	List<Byte> dests=null;
 	Movement result=null;
 	
-	public BoardObserver(byte id)
+	public EditObserver()
 	{
 		super();
 		currField=null;
-		movs=null;
 		result=null;
 		dests=null;
-		this.id=id;
 	}
 
 	public void init(Board board)
 	{
 		currField=null;
-		movs=null;
 		result=null;
 		dests=null;
 		currBoard=board;
@@ -73,16 +68,15 @@ class BoardObserver extends Thread implements FieldListener
 		
 		if(op==FieldListener.SELECT_FIELD)
 		{
-			if(currBoard.get(field)==id)
+			if(currBoard.get(field)!=0)
 			{
 				currField=new Byte(field);
-				movs=currBoard.getPossibleMoves(id);
 				dests=new ArrayList<Byte>();
-				for(int i=0;i<movs.size();i++)
+				for(byte i=0;i<64;i++)
 				{
-					if(movs.get(i).getOrigin()==currField)
+					if(currBoard.get(i)==0)
 					{
-						dests.add(movs.get(i).getDestination());
+						dests.add(i);
 					}
 				}
 				return dests;
@@ -90,25 +84,23 @@ class BoardObserver extends Thread implements FieldListener
 			else
 			{
 				currField=null;
-				movs=null;
 				dests=null;
 				return null;
 			}
 		}
 		else if(op==FieldListener.EXECUTE_MOV)
 		{
-			if(movs!=null)
+			if(currField!=null)
 			{
-				for(int i=0;i<movs.size();i++)
+				if(currBoard.get(currField)!=0)
 				{
-					if(movs.get(i).getOrigin()==currField)
+					if(currBoard.get(field)==0)
 					{
-						if(movs.get(i).getDestination()==field)
-						{
-							result=movs.get(i);
-							try {return null;}
-							finally {active=false;}
-						}
+						currBoard.set(field, currBoard.get(currField));
+						currBoard.set(currField, (byte) 0);
+						currField=null;
+						dests=null;
+						return null;
 					}
 				}
 			}

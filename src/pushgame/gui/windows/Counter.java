@@ -2,7 +2,6 @@ package pushgame.gui.windows;
 
 import java.util.Date;
 
-import javax.swing.border.Border;
 
 
 /**
@@ -100,11 +99,9 @@ public class Counter extends Thread
 	 */
 	public void reset()
 	{
-		count = 0;
 		time[0] = 1;
 		time[1] = 1;
 		time[2] = 1;
-		count = 1;
 	}
 	
 	/**
@@ -133,6 +130,7 @@ public class Counter extends Thread
 		home = root;
 		active = true;
 		reset();
+		count=1;
 	}
 
 	/**

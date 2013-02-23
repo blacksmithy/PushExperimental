@@ -20,7 +20,7 @@ public class BoardPanel extends JPanel {
 	/**
 	 * Board object with actual game (board) state.
 	 */
-	private Board board;
+	protected Board board;
 	
 	/**
 	 * Default constructor. Sets default size (512x512) and background color (white).

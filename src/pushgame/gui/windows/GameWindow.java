@@ -8,8 +8,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.List;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.swing.JButton;
@@ -23,10 +23,9 @@ import javax.swing.SwingConstants;
 import pushgame.gui.boardpanel.InteractiveBoardPanel;
 import pushgame.logic.Board;
 import pushgame.logic.Game;
-import pushgame.players.HumanPlayer;
+import pushgame.players.BoardEditor;
 import pushgame.players.Player;
 import pushgame.players.PlayerFactory;
-import pushgame.players.RandomPlayer;
 import pushgame.util.GameConfig;
 
 
@@ -49,10 +48,28 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 	public JProgressBar time2 = new JProgressBar(SwingConstants.VERTICAL, 0, 0);
 	public JLabel timer[] = { new JLabel("Czas"), new JLabel("0:00"),
 			new JLabel("Czas"), new JLabel("0:00") };
-	
+
 	public static GameWindow startNewWindow()
 	{
 		GameWindow win=new GameWindow();
+		Thread winThr=new Thread(win);
+		winThr.start();
+		return win;
+	}	
+	
+	public static GameWindow launchExistingGame(String fname) throws FileNotFoundException, ClassNotFoundException, IOException
+	{
+		InteractiveBoardPanel panel=new InteractiveBoardPanel();
+		panel.loadFromFile(fname);
+		GameWindow win=new GameWindow(panel);
+		Thread winThr=new Thread(win);
+		winThr.start();
+		return win;
+	}	
+	
+	public static GameWindow launchEditMode()
+	{
+		GameWindow win=new GameWindow(true);
 		Thread winThr=new Thread(win);
 		winThr.start();
 		return win;
@@ -135,10 +152,87 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 		//playTheGame();
 	}
 	
+	public GameWindow(InteractiveBoardPanel panel)
+	{
+		super("Gra");
+		// setMinimumSize(minimumSize)
+		setBounds(10, 10, 700, 600);
+		setBackground(Color.GRAY);
+		setResizable(false);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setEnabled(true);
+		setVisible(true);
+		addWindowListener(this);
+		getContentPane().setLayout(null);
+		start = new Point(20, 50);
+		checker = panel;
+
+		pause.setBounds(570, 180, 100, 40);
+		savegame.setBounds(570, 250, 100, 40);
+		exit.setBounds(570, 320, 100, 40);
+		pause.addActionListener(this);
+		exit.addActionListener(this);
+		savegame.addActionListener(this);
+		getContentPane().add(pause);
+		getContentPane().add(exit);
+		getContentPane().add(savegame);
+
+		time1.setBounds(570, 30, 20, 120);
+		time1.setForeground(GameConfig.player1Color);
+		time1.setMaximum(1);
+		time1.setValue(1);
+		getContentPane().add(time1);
+		timer[0].setBounds(600, 50, 80, 50);
+		timer[0].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
+		getContentPane().add(timer[0]);
+		timer[1].setBounds(600, 90, 80, 50);
+		timer[1].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
+		getContentPane().add(timer[1]);
+
+		time2.setBounds(570, 400, 20, 120);
+		time2.setForeground(GameConfig.player2Color);
+		time2.setMaximum(1);
+		time2.setValue(1);
+		getContentPane().add(time2);
+		timer[2].setBounds(600, 430, 80, 50);
+		timer[2].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
+		getContentPane().add(timer[2]);
+		timer[3].setBounds(600, 470, 80, 50);
+		timer[3].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
+		getContentPane().add(timer[3]);
+
+		
+		checker.setVisible(true);
+		checker.setLocation(start);
+		getContentPane().add(checker);
+		
+		lblGracz_1.setBounds(595, 30, 94, 30);
+		lblGracz_1.setFont(ACTIVE_FONT);
+		lblGracz_1.setVisible(true);
+		getContentPane().add(lblGracz_1);
+		
+		lblGracz_2.setBounds(595, 400, 94, 30);
+		lblGracz_2.setFont(ACTIVE_FONT);
+		lblGracz_2.setVisible(true);
+		getContentPane().add(lblGracz_2);
+		//playTheGame();
+	}
+	
 	public void playTheGame() {
-		Player player1 = PlayerFactory.getPlayer((byte) 1, GameConfig.delay);
-		Player player2 = PlayerFactory.getPlayer((byte) 2, GameConfig.delay);
+		Player player1;
+		Player player2;
+		if(editMode)
+		{
+			player1 = new BoardEditor();
+			player2 = new BoardEditor();
+		}
+		else
+		{
+			player1 = PlayerFactory.getPlayer((byte) 1, GameConfig.delay);
+			player2 = PlayerFactory.getPlayer((byte) 2, GameConfig.delay);
+		}
 		game = new Game(player1, player2, this);
+		if(editMode) {game.hold();}
 		game.play();
 		checker.repaint();
 		checker.refreshState();
@@ -156,122 +250,18 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 	public InteractiveBoardPanel getBoardPanel() {
 		return this.checker;
 	}
-//	
-//	public GameWindow(Logic inL)
-//	{
-//		super("Gra");
-//		// setMinimumSize(minimumSize)
-//		setBounds(10, 10, 700, 600);
-//		setBackground(Color.GRAY);
-//		setResizable(false);
-//		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-//		setEnabled(true);
-//		setVisible(true);
-//		addMouseListener(this);
-//		addWindowListener(this);
-//		setLayout(null);
-//		start = new Point(20, 50);
-//
-//		checker = new Checker(createImage(500, 500), Settings.size);
-//		checker.game=inL;
-//		counter = new Counter(this);
-//
-//		pause.setBounds(570, 180, 100, 40);
-//		savegame.setBounds(570, 250, 100, 40);
-//		exit.setBounds(570, 320, 100, 40);
-//		pause.addActionListener(this);
-//		exit.addActionListener(this);
-//		savegame.addActionListener(this);
-//		add(pause);
-//		add(exit);
-//		add(savegame);
-//
-//		time1.setBounds(570, 30, 20, 120);
-//		time1.setMaximum(counter.getTime(0));
-//		time1.setValue(counter.getTime(1));
-//		time1.setForeground(Settings.C1);
-//		add(time1);
-//		timer[0].setBounds(600, 10, 80, 100);
-//		timer[0].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
-//		add(timer[0]);
-//		timer[1].setText(counter.getTimeString(1));
-//		timer[1].setBounds(600, 50, 80, 100);
-//		timer[1].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
-//		add(timer[1]);
-//
-//		time2.setBounds(570, 400, 20, 120);
-//		time2.setMaximum(counter.getTime(0));
-//		time2.setValue(counter.getTime(2));
-//		time2.setForeground(Settings.C2);
-//		add(time2);
-//		timer[2].setBounds(600, 380, 80, 100);
-//		timer[2].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
-//		add(timer[2]);
-//		timer[3].setText(counter.getTimeString(2));
-//		timer[3].setBounds(600, 420, 80, 100);
-//		timer[3].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
-//		add(timer[3]);
-//
-//		counter.start();
-//		//pass.setEnabled(false);
-//		// new Finisher(this).start();
-//		//checker.game.setupRefreshTarget(this);
-//		refresher=new Refresher(this);
-//		refresher.start();
-//		checker.game.endTurn();
-//	}
-//	
-//	public GameWindow(boolean editable)
-//	{
-//		super("Tryb Edycji");
-//		editMode=editable;
-//		// setMinimumSize(minimumSize)
-//		setBounds(10, 10, 700, 600);
-//		setBackground(Color.GRAY);
-//		setResizable(false);
-//		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-//		setEnabled(true);
-//		setVisible(true);
-//		addMouseListener(this);
-//		addWindowListener(this);
-//		setLayout(null);
-//		start = new Point(20, 50);
-//		checker = new Checker(createImage(500, 500), Settings.size,editable);
-//
-//		pause.setBounds(570, 180, 100, 40);
-//		savegame.setBounds(570, 250, 100, 40);
-//		exit.setBounds(570, 320, 100, 40);
-//		pause.addActionListener(this);
-//		exit.addActionListener(this);
-//		savegame.addActionListener(this);
-//		add(pause);
-//		add(exit);
-//		add(savegame);
-//
-//		time1.setBounds(570, 30, 20, 120);
-//		time1.setMaximum(1);
-//		time1.setValue(1);
-//		time1.setForeground(Settings.C1);
-//		add(time1);
-//
-//		time2.setBounds(570, 400, 20, 120);
-//		time2.setMaximum(1);
-//		time2.setValue(1);
-//		time2.setForeground(Settings.C2);
-//		add(time2);
-//
-//		pause.setEnabled(false);
-//		//pass.setEnabled(false);
-//		// new Finisher(this).start();
-//		//checker.game.setupRefreshTarget(this);
-//		checker.game.locked=false;
-//	}
-//	
-
+	
+	
+	public GameWindow(boolean editable)
+	{
+		this();
+		editMode=editable;
+		pause.setEnabled(false);
+	}
+	
 	
 	public void onExit()
 	{
-		if(editMode) {return;}
 		game.endGame();
 	}
 
@@ -298,30 +288,26 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 		}
 		else if (src == savegame)
 		{
-//			if(counter!=null) {
-//				counter.pause();
-//			}
-//			
-//			JFileChooser fs=new JFileChooser();
-//			int returnVal = fs.showOpenDialog(this);
-//
-//	        if (returnVal == JFileChooser.APPROVE_OPTION) {
-//	            File file = fs.getSelectedFile();
-//	            System.out.println(file.getPath());
-//	            try
-//				{
-//					checker.game.saveToFile(file.getPath());
-//				}
-//				catch (IOException e1)
-//				{
-//					JOptionPane.showMessageDialog(null,"Nie udało się zapisać gry.");
-//				}
-//	        }
-//	        
-//	        if(counter!=null) {
-//				checker.game.resumeGame();
-//				counter.unpause();
-//	        }
+			game.hold();
+			
+			JFileChooser fs=new JFileChooser();
+			int returnVal = fs.showOpenDialog(this);
+
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            File file = fs.getSelectedFile();
+	            System.out.println(file.getPath());
+	            try
+				{
+					checker.saveToFile(file.getPath());
+				}
+				catch (IOException e1)
+				{
+					JOptionPane.showMessageDialog(null,"Nie udało się zapisać gry.");
+				}
+	        }
+	        
+	        if(!editMode)
+	        	{game.unhold();}
 		}
 		repaint();
 	}

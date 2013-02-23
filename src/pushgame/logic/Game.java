@@ -1,8 +1,8 @@
 package pushgame.logic;
 
 import java.util.Date;
-
 import javax.swing.JOptionPane;
+
 
 import pushgame.gui.windows.Counter;
 import pushgame.gui.windows.GameWindow;
@@ -15,7 +15,7 @@ public class Game {
 	private Player player2;
 	private InteractiveBoardPanel boardPanel;
 	private GameWindow window;
-	private static final long PLAYER_SLEEP = 0L;
+	//private static final long PLAYER_SLEEP = 0L;
 	private boolean active=true;
 	private Counter counter;
 
@@ -97,7 +97,6 @@ public class Game {
 			System.out.println("P2 \"thinking\" time: " + ((end - start)) + "ns");
 			
 			board.makeMove(move);
-			
 			window.refreshBoard();
 			
 			try {
@@ -111,5 +110,4 @@ public class Game {
 		System.out.println("And the winner is... PLAYER" + winner + "!");
 		JOptionPane.showMessageDialog(null,"Gracz "+Integer.toString(winner)+" wygrał!!!");
 	}
-
 }

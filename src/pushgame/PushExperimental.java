@@ -2,7 +2,6 @@ package pushgame;
 
 import java.awt.EventQueue;
 
-import pushgame.gui.windows.GameWindow;
 import pushgame.gui.windows.MainMenu;
 
 

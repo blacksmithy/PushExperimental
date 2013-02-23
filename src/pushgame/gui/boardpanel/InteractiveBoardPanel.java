@@ -4,8 +4,15 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 
+import pushgame.logic.Board;
 import pushgame.util.GlobalSettings;
 
 public class InteractiveBoardPanel extends BoardPanel implements MouseListener
@@ -106,6 +113,18 @@ public class InteractiveBoardPanel extends BoardPanel implements MouseListener
 	public void mousePressed(MouseEvent arg0){}
 	public void mouseReleased(MouseEvent arg0){}
 
-
+	public void saveToFile(String fname) throws IOException
+	{
+		ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fname,false));
+	    out.writeObject(board);
+	    out.close();
+	}
+	
+	public void loadFromFile(String fname) throws FileNotFoundException, IOException, ClassNotFoundException
+	{
+		ObjectInputStream in = new ObjectInputStream(new FileInputStream(fname));
+	    board = (Board) in.readObject();
+	    in.close();
+	}
 
 }

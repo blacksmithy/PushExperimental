@@ -1,5 +1,6 @@
 package pushgame.logic;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,7 +8,11 @@ import java.util.List;
 
 import pushgame.util.GlobalSettings;
 
-public class Board {
+public class Board implements Serializable {
+	
+	private static final long serialVersionUID = 6328337622665137540L;
+	
+	
 	/**
 	 * Stores player1's checkers positions.
 	 */
@@ -131,7 +136,7 @@ public class Board {
 	 *            <li><b>player's id</b> => sets player's checker.</li>
 	 *            </ul>
 	 */
-	protected void set(byte row, byte column, byte value) {
+	public void set(byte row, byte column, byte value) {
 		if (value == 0) {
 			player1Board = player1Board
 					& fieldsMasksZero[fieldsNums[row][column]];
@@ -156,7 +161,7 @@ public class Board {
 	 *            <li><b>player's id</b> => sets player's checker.</li>
 	 *            </ul>
 	 */
-	protected void set(byte field, byte value) {
+	public void set(byte field, byte value) {
 		if (value == 0) {
 			player1Board = player1Board & fieldsMasksZero[field];
 			player2Board = player2Board & fieldsMasksZero[field];
