@@ -3,7 +3,7 @@ package pushgame.players;
 import java.util.ArrayList;
 import java.util.List;
 
-import pushgame.gui.FieldListener;
+import pushgame.gui.boardpanel.FieldListener;
 import pushgame.logic.Board;
 import pushgame.logic.Movement;
 import pushgame.util.GlobalSettings;
@@ -130,6 +130,12 @@ class BoardObserver extends Thread implements FieldListener
 			catch (InterruptedException e)
 			{e.printStackTrace();}
 		}
+	}
+
+	@Override
+	public void quit()
+	{
+		active=false;
 	}
 	
 }

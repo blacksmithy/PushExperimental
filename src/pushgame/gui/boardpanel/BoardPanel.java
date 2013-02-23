@@ -1,4 +1,4 @@
-package pushgame.gui;
+package pushgame.gui.boardpanel;
 
 import java.awt.Color;
 import java.awt.Graphics;

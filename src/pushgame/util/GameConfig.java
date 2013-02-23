@@ -6,6 +6,7 @@ public class GameConfig {
 
 	public static Color player1Color = Color.blue;
 	public static Color player2Color = Color.red;
+	public static int delay=250;
 	private static GameConfig config;
 	
 	private GameConfig() {

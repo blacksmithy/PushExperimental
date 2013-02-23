@@ -1,4 +1,4 @@
-package pushgame.gui;
+package pushgame.gui.boardpanel;
 
 import java.util.List;
 
@@ -8,4 +8,5 @@ public interface FieldListener
 	static final byte EXECUTE_MOV=2;
 	public List<Byte> fieldClicked(byte row,byte col,byte op);
 	public FieldListener getListener();
+	public void quit();
 }

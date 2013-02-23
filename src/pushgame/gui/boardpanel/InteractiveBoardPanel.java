@@ -1,4 +1,4 @@
-package pushgame.gui;
+package pushgame.gui.boardpanel;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -57,11 +57,16 @@ public class InteractiveBoardPanel extends BoardPanel implements MouseListener
 	public void setFieldListener(FieldListener fl)
 	{
 		supervisor=fl.getListener();
-		System.out.println(supervisor.getClass().getSimpleName());
 	}
 	public void clearFieldListener()
 	{
 		supervisor=null;
+	}
+	
+	public void quit()
+	{
+		if(supervisor==null) {return;}
+		supervisor.quit();
 	}
 	
 	public void mouseClicked(MouseEvent arg0)

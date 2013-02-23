@@ -2,7 +2,7 @@ package pushgame.players;
 
 import java.util.List;
 
-import pushgame.gui.FieldListener;
+import pushgame.gui.boardpanel.FieldListener;
 import pushgame.logic.Board;
 import pushgame.logic.Movement;
 
@@ -40,4 +40,5 @@ public abstract class Player implements FieldListener {
 	public FieldListener getListener() {
 		return this;
 	}
+	public void quit(){}
 }
