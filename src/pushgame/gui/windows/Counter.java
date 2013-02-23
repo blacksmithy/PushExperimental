@@ -2,6 +2,8 @@ package pushgame.gui.windows;
 
 import java.util.Date;
 
+import javax.swing.border.Border;
+
 
 /**
  * Licznik do odmierzania sumarycznego czasu wykorzystanego przez przez gracza. 
@@ -51,6 +53,14 @@ public class Counter extends Thread
 	{
 		turn = i;
 		commitTime();
+		if(turn==1)
+		{
+			home.getGraphics().drawRect(570, 49, 120, 130);
+		}
+		else if(turn==2)
+		{
+			home.getGraphics().drawRect(570, 419, 120, 130);
+		}
 	}
 	
 	long last=0,curr=0;
@@ -61,10 +71,9 @@ public class Counter extends Thread
 		curr=new Date().getTime();
 		ltime[turn] += count*(curr-last);
 		time[turn] = (int)(ltime[turn]/1000);
-		home.time1.setValue(1);
-		home.time2.setValue(1);
 		home.timer[1].setText(getTimeString(1));
 		home.timer[3].setText(getTimeString(2));
+		if(home.getGraphics()==null) {return;}
 	}
 
 	/**

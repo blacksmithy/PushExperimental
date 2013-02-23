@@ -38,6 +38,10 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 	InteractiveBoardPanel checker;
 	Game game;
 	Point start;
+	public JLabel lblGracz_1 = new JLabel("Gracz 1");
+	public JLabel lblGracz_2 = new JLabel("Gracz 2");
+	public static Font IDLE_FONT=new Font("Courier New", Font.PLAIN, 16);
+	public static Font ACTIVE_FONT=new Font("Arial Black", Font.BOLD, 20);
 	JButton pause = new JButton("Wstrzymaj");
 	JButton savegame = new JButton("Zapisz");
 	JButton exit = new JButton("Wyjdź");
@@ -70,7 +74,7 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 		setEnabled(true);
 		setVisible(true);
 		addWindowListener(this);
-		setLayout(null);
+		getContentPane().setLayout(null);
 		start = new Point(20, 50);
 		checker = new InteractiveBoardPanel();
 
@@ -80,33 +84,33 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 		pause.addActionListener(this);
 		exit.addActionListener(this);
 		savegame.addActionListener(this);
-		add(pause);
-		add(exit);
-		add(savegame);
+		getContentPane().add(pause);
+		getContentPane().add(exit);
+		getContentPane().add(savegame);
 
 		time1.setBounds(570, 30, 20, 120);
 		time1.setForeground(GameConfig.player1Color);
 		time1.setMaximum(1);
 		time1.setValue(1);
-		add(time1);
-		timer[0].setBounds(600, 10, 80, 100);
+		getContentPane().add(time1);
+		timer[0].setBounds(600, 50, 80, 50);
 		timer[0].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
-		add(timer[0]);
-		timer[1].setBounds(600, 50, 80, 100);
+		getContentPane().add(timer[0]);
+		timer[1].setBounds(600, 90, 80, 50);
 		timer[1].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
-		add(timer[1]);
+		getContentPane().add(timer[1]);
 
 		time2.setBounds(570, 400, 20, 120);
 		time2.setForeground(GameConfig.player2Color);
 		time2.setMaximum(1);
 		time2.setValue(1);
-		add(time2);
-		timer[2].setBounds(600, 380, 80, 100);
+		getContentPane().add(time2);
+		timer[2].setBounds(600, 430, 80, 50);
 		timer[2].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
-		add(timer[2]);
-		timer[3].setBounds(600, 420, 80, 100);
+		getContentPane().add(timer[2]);
+		timer[3].setBounds(600, 470, 80, 50);
 		timer[3].setFont(new Font(Font.SANS_SERIF, Font.BOLD, 30));
-		add(timer[3]);
+		getContentPane().add(timer[3]);
 
 		
 		//pass.setEnabled(false);
@@ -117,7 +121,17 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 		checker.setBoard(beg);
 		checker.setVisible(true);
 		checker.setLocation(start);
-		add(checker);
+		getContentPane().add(checker);
+		
+		lblGracz_1.setBounds(595, 30, 94, 30);
+		lblGracz_1.setFont(ACTIVE_FONT);
+		lblGracz_1.setVisible(true);
+		getContentPane().add(lblGracz_1);
+		
+		lblGracz_2.setBounds(595, 400, 94, 30);
+		lblGracz_2.setFont(ACTIVE_FONT);
+		lblGracz_2.setVisible(true);
+		getContentPane().add(lblGracz_2);
 		//playTheGame();
 	}
 	
@@ -329,5 +343,4 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 	public void mouseExited(MouseEvent e){}
 	public void mousePressed(MouseEvent e){}
 	public void mouseReleased(MouseEvent e){}
-
 }
