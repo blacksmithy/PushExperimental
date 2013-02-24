@@ -74,7 +74,7 @@ public class Game {
 			
 			window.refreshBoard();
 			
-			if (board.getWinner() != 0)
+			if ((winner = board.getWinner()) != 0)
 				break;
 			
 			try {

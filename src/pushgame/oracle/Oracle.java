@@ -20,7 +20,7 @@ public abstract class Oracle {
 	public Oracle() {}
 	
 	/* ********************************************************************* */
-	public abstract short getProphecy(Board in, Board out, Movement move);
+	public abstract short getProphecy(Board in, Board out, Movement move, byte player);
 	/* ********************************************************************* */
 	
 	/**

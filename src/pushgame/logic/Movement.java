@@ -23,7 +23,7 @@ public class Movement {
 	 */
 	protected byte angle;
 	/**
-	 * Number of checkers to push.
+	 * Number of pawns to push.
 	 */
 	protected byte chain;
 	protected static byte boardSize = GlobalSettings.BOARD_SIZE;
@@ -101,6 +101,7 @@ public class Movement {
 			return true;
 		return false;
 	}
+
 	
 	/**
 	 * Returns origin field of movement.
@@ -142,7 +143,7 @@ public class Movement {
 
 
 	/**
-	 * Returns chain length - number of checkers to be pushed in this move.
+	 * Returns chain length - number of pawns to be pushed in this move.
 	 * @return Chain length.
 	 */
 	public byte getChain() {

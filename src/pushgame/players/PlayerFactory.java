@@ -6,7 +6,7 @@ import javax.swing.JComboBox;
 public class PlayerFactory
 {
 	static final public String HUMAN_PLAYER="Gracz";
-	static final public String GREEDY_AI="AI zach�anny";
+	static final public String GREEDY_AI="AI zachłanny";
 	static final public String ALPHA_BETA_AI="AI alfa-beta";
 	static final public String RANDOM_AI="AI losowy";
 	static final public String FS_ALPHA_BETA = "AI alfa-beta FS";
@@ -26,7 +26,7 @@ public class PlayerFactory
 		cb.removeAllItems();
 		cb.addItem(HUMAN_PLAYER);
 		cb.addItem(RANDOM_AI);
-//		cb.addItem(GREEDY_AI);
+		cb.addItem(GREEDY_AI);
 //		cb.addItem(ALPHA_BETA_AI);
 //		cb.addItem(FS_ALPHA_BETA);
 //		cb.addItem(FS_ALPHA_BETA_TT);
@@ -111,7 +111,7 @@ public class PlayerFactory
 		}
 		else if(ai==GREEDY_AI)
 		{
-			result=null;
+			result=new GreedyPlayer(id, delay);
 		}
 		md++;
 		return result;

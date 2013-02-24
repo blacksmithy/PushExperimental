@@ -85,14 +85,14 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 		super("Gra");
 		// setMinimumSize(minimumSize)
 		setBounds(10, 10, 700, 600);
-		setBackground(Color.GRAY);
+		setBackground(Color.DARK_GRAY);
 		setResizable(false);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setEnabled(true);
 		setVisible(true);
 		addWindowListener(this);
 		getContentPane().setLayout(null);
-		start = new Point(20, 50);
+		start = new Point(20, 30);
 		checker = new InteractiveBoardPanel();
 
 		pause.setBounds(570, 180, 100, 40);
