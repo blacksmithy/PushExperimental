@@ -27,7 +27,7 @@ public class PlayerFactory
 		cb.addItem(HUMAN_PLAYER);
 		cb.addItem(RANDOM_AI);
 		cb.addItem(GREEDY_AI);
-//		cb.addItem(ALPHA_BETA_AI);
+		cb.addItem(ALPHA_BETA_AI);
 //		cb.addItem(FS_ALPHA_BETA);
 //		cb.addItem(FS_ALPHA_BETA_TT);
 //		cb.addItem(ELF_TEST);
@@ -112,6 +112,10 @@ public class PlayerFactory
 		else if(ai==GREEDY_AI)
 		{
 			result=new GreedyPlayer(id, delay);
+		}
+		else if(ai == ALPHA_BETA_AI)
+		{
+			result=new AlphaBetaPlayer(id, delay);
 		}
 		md++;
 		return result;
