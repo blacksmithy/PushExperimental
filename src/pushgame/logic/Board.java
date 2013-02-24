@@ -9,10 +9,9 @@ import java.util.List;
 import pushgame.util.GlobalSettings;
 
 public class Board implements Serializable {
-	
+
 	private static final long serialVersionUID = 6328337622665137540L;
-	
-	
+
 	/**
 	 * Stores player1's pawns positions.
 	 */
@@ -793,7 +792,7 @@ public class Board implements Serializable {
 							/* ************************************************** */
 
 							/*
-							 *  ******************* angle == 5
+							 * ******************* angle == 5
 							 * *******************
 							 */
 							temp = (byte) ((byte) i + 7);
@@ -890,8 +889,8 @@ public class Board implements Serializable {
 							}
 						}
 						/* ************************************************** */
-					} 
-					if(!forwardMoves) {
+					}
+					if (!forwardMoves) {
 						/* ******************* angle == 2 ******************* */
 
 						temp = (byte) ((byte) i + 1);
@@ -954,251 +953,251 @@ public class Board implements Serializable {
 	/**
 	 * Returns list of all possible moves (Movement objects) for given player's<br>
 	 * <b>pawn without priorities<b>
+	 * 
 	 * @param player
 	 *            Player's id.
-	 * @param pawn Selected pawn.
+	 * @param pawn
+	 *            Selected pawn.
 	 * @return List of all pawn's possible moves.
 	 */
 	public List<Movement> getPawnPossibleMoves(byte player, byte pawn) {
-			List<Movement> moves = new ArrayList<Movement>();
-			
-			if (pawn < 0 || pawn > 63)
-				return moves;
-			
-			byte temp = 0;
-			byte chain = 0;
-			byte empty = 0;
-			long playerBoard = 0;
-			long enemyBoard = 0;
-			if (player == player1) {
-				playerBoard = player1Board;
-				enemyBoard = player2Board;
-			} else {
-				playerBoard = player2Board;
-				enemyBoard = player1Board;
-			}
-			boolean forwardMoves = true;
-			boolean backwardMoves = false;
-			int stage = 0;
+		List<Movement> moves = new ArrayList<Movement>();
 
-			while (moves.isEmpty() && stage < 3) {
-				if (stage == 1) {
-					forwardMoves = false;
-					backwardMoves = false;
-				} else if (stage == 2) {
-					forwardMoves = false;
-					backwardMoves = true;
-				}
-
-				byte i = pawn;
-					if ((playerBoard & fieldsMasks[i]) != 0) {
-
-						if ((forwardMoves && player == player1)
-								|| (backwardMoves && player == player2)) {
-							/* ******************* angle == 3 ******************* */
-
-							temp = (byte) ((byte) i + 9);
-							if (temp < 64) {
-								if ((playerBoard & fieldsMasks[temp]) != 0) {
-									chain = getChainLength(i, (byte) 3);
-									if (chain != 0) {
-										empty = countNextEmptyFields(
-												(byte) (i + (9 * chain)), (byte) 3);
-										for (byte dist = 1; dist <= empty; ++dist) {
-											moves.add(new Movement(i, dist,
-													(byte) 3, chain));
-										}
-									}
-								} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
-									empty = countNextEmptyFields(i, (byte) 3);
-									for (byte dist = 1; dist <= empty; ++dist) {
-										moves.add(new Movement(i, dist, (byte) 3,
-												(byte) 0));
-									}
-								}
-							}
-
-							/* ************************************************** */
-
-							/* ******************* angle == 4 ******************* */
-
-							temp = (byte) ((byte) i + 8);
-							if (temp < 64) {
-								if ((playerBoard & fieldsMasks[temp]) != 0) {
-									chain = getChainLength(i, (byte) 4);
-									if (chain != 0) {
-										empty = countNextEmptyFields(
-												(byte) (i + (8 * chain)), (byte) 4);
-										for (byte dist = 1; dist <= empty; ++dist) {
-											moves.add(new Movement(i, dist,
-													(byte) 4, chain));
-										}
-									}
-								} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
-									empty = countNextEmptyFields(i, (byte) 4);
-									for (byte dist = 1; dist <= empty; ++dist) {
-										moves.add(new Movement(i, dist, (byte) 4,
-												(byte) 0));
-									}
-								}
-
-								/* ************************************************** */
-
-								/*
-								 *  ******************* angle == 5
-								 * *******************
-								 */
-								temp = (byte) ((byte) i + 7);
-								if (temp < 64) {
-									if ((playerBoard & fieldsMasks[temp]) != 0) {
-										chain = getChainLength(i, (byte) 5);
-										if (chain != 0) {
-											empty = countNextEmptyFields(
-													(byte) (i + (7 * chain)),
-													(byte) 5);
-											for (byte dist = 1; dist <= empty; ++dist) {
-												moves.add(new Movement(i, dist,
-														(byte) 5, chain));
-											}
-										}
-									} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
-										empty = countNextEmptyFields(i, (byte) 5);
-										for (byte dist = 1; dist <= empty; ++dist) {
-											moves.add(new Movement(i, dist,
-													(byte) 5, (byte) 0));
-										}
-									}
-								}
-
-								/* ************************************************** */
-							}
-						} else if ((forwardMoves && player == player2)
-								|| (backwardMoves && player == player1)) {
-							/* ******************* angle == 0 ******************* */
-							temp = (byte) ((byte) i - 8);
-							if (temp >= 0) {
-								if ((playerBoard & fieldsMasks[temp]) != 0) {
-									chain = getChainLength(i, (byte) 0);
-									if (chain != 0) {
-										empty = countNextEmptyFields(
-												(byte) (i - (chain * 8)), (byte) 0);
-										for (byte dist = 1; dist <= empty; ++dist) {
-											moves.add(new Movement(i, dist,
-													(byte) 0, chain));
-										}
-									}
-								} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
-									empty = countNextEmptyFields(i, (byte) 0);
-									for (byte dist = 1; dist <= empty; ++dist) {
-										moves.add(new Movement(i, dist, (byte) 0,
-												(byte) 0));
-									}
-								}
-							}
-							/* ************************************************** */
-
-							/* ******************* angle == 1 ******************* */
-							temp = (byte) ((byte) i - 7);
-							if (temp >= 0) {
-								if ((playerBoard & fieldsMasks[temp]) != 0) {
-									chain = getChainLength(i, (byte) 1);
-									if (chain != 0) {
-										empty = countNextEmptyFields(
-												(byte) (i - (chain * 7)), (byte) 1);
-										for (byte dist = 1; dist <= empty; ++dist) {
-											moves.add(new Movement(i, dist,
-													(byte) 1, chain));
-										}
-									}
-								} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
-									empty = countNextEmptyFields(i, (byte) 1);
-									for (byte dist = 1; dist <= empty; ++dist) {
-										moves.add(new Movement(i, dist, (byte) 1,
-												(byte) 0));
-									}
-								}
-							}
-							/* ************************************************** */
-
-							/* ******************* angle == 7 ******************* */
-							temp = (byte) ((byte) i - 9);
-							if (temp >= 0) {
-								if ((playerBoard & fieldsMasks[temp]) != 0) {
-									chain = getChainLength(i, (byte) 7);
-									if (chain != 0) {
-										empty = countNextEmptyFields(
-												(byte) (i - (chain * 9)), (byte) 7);
-										for (byte dist = 1; dist <= empty; ++dist) {
-											moves.add(new Movement(i, dist,
-													(byte) 7, chain));
-										}
-									}
-								} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
-									empty = countNextEmptyFields(i, (byte) 7);
-									for (byte dist = 1; dist <= empty; ++dist) {
-										moves.add(new Movement(i, dist, (byte) 7,
-												(byte) 0));
-									}
-								}
-							}
-							/* ************************************************** */
-						} else {
-							/* ******************* angle == 2 ******************* */
-
-							temp = (byte) ((byte) i + 1);
-							if (temp < 64 && (temp / 8) == (temp / 8)) {
-								if ((playerBoard & fieldsMasks[temp]) != 0) {
-									chain = getChainLength(i, (byte) 2);
-									if (chain != 0) {
-										empty = countNextEmptyFields(
-												(byte) (i + chain), (byte) 2);
-										for (byte dist = 1; dist <= empty; ++dist) {
-											moves.add(new Movement(i, dist,
-													(byte) 2, chain));
-										}
-									}
-								} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
-									empty = countNextEmptyFields(i, (byte) 2);
-									for (byte dist = 1; dist <= empty; ++dist) {
-										moves.add(new Movement(i, dist, (byte) 2,
-												(byte) 0));
-									}
-								}
-							}
-
-							/* ************************************************** */
-
-							/* ******************* angle == 6 ******************* */
-
-							temp = (byte) ((byte) i - 1);
-							if (temp >= 0 && (temp / 8) == (temp / 8)) {
-								if ((playerBoard & fieldsMasks[temp]) != 0) {
-									chain = getChainLength(i, (byte) 6);
-									if (chain != 0) {
-										empty = countNextEmptyFields(
-												(byte) (i - chain), (byte) 6);
-										for (byte dist = 1; dist <= empty; ++dist) {
-											moves.add(new Movement(i, dist,
-													(byte) 6, chain));
-										}
-									}
-								} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
-									empty = countNextEmptyFields(i, (byte) 6);
-									for (byte dist = 1; dist <= empty; ++dist) {
-										moves.add(new Movement(i, dist, (byte) 6,
-												(byte) 0));
-									}
-								}
-							}
-
-							/* ************************************************** */
-						}
-				}
-				++stage;
-			}
+		if (pawn < 0 || pawn > 63)
 			return moves;
+
+		byte temp = 0;
+		byte chain = 0;
+		byte empty = 0;
+		long playerBoard = 0;
+		long enemyBoard = 0;
+		if (player == player1) {
+			playerBoard = player1Board;
+			enemyBoard = player2Board;
+		} else {
+			playerBoard = player2Board;
+			enemyBoard = player1Board;
+		}
+		boolean forwardMoves = true;
+		boolean backwardMoves = false;
+		int stage = 0;
+
+		while (moves.isEmpty() && stage < 3) {
+			if (stage == 1) {
+				forwardMoves = false;
+				backwardMoves = false;
+			} else if (stage == 2) {
+				forwardMoves = false;
+				backwardMoves = true;
+			}
+
+			byte i = pawn;
+			if ((playerBoard & fieldsMasks[i]) != 0) {
+
+				if ((forwardMoves && player == player1)
+						|| (backwardMoves && player == player2)) {
+					/* ******************* angle == 3 ******************* */
+
+					temp = (byte) ((byte) i + 9);
+					if (temp < 64) {
+						if ((playerBoard & fieldsMasks[temp]) != 0) {
+							chain = getChainLength(i, (byte) 3);
+							if (chain != 0) {
+								empty = countNextEmptyFields(
+										(byte) (i + (9 * chain)), (byte) 3);
+								for (byte dist = 1; dist <= empty; ++dist) {
+									moves.add(new Movement(i, dist, (byte) 3,
+											chain));
+								}
+							}
+						} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+							empty = countNextEmptyFields(i, (byte) 3);
+							for (byte dist = 1; dist <= empty; ++dist) {
+								moves.add(new Movement(i, dist, (byte) 3,
+										(byte) 0));
+							}
+						}
+					}
+
+					/* ************************************************** */
+
+					/* ******************* angle == 4 ******************* */
+
+					temp = (byte) ((byte) i + 8);
+					if (temp < 64) {
+						if ((playerBoard & fieldsMasks[temp]) != 0) {
+							chain = getChainLength(i, (byte) 4);
+							if (chain != 0) {
+								empty = countNextEmptyFields(
+										(byte) (i + (8 * chain)), (byte) 4);
+								for (byte dist = 1; dist <= empty; ++dist) {
+									moves.add(new Movement(i, dist, (byte) 4,
+											chain));
+								}
+							}
+						} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+							empty = countNextEmptyFields(i, (byte) 4);
+							for (byte dist = 1; dist <= empty; ++dist) {
+								moves.add(new Movement(i, dist, (byte) 4,
+										(byte) 0));
+							}
+						}
+
+						/* ************************************************** */
+
+						/*
+						 * ******************* angle == 5 *******************
+						 */
+						temp = (byte) ((byte) i + 7);
+						if (temp < 64) {
+							if ((playerBoard & fieldsMasks[temp]) != 0) {
+								chain = getChainLength(i, (byte) 5);
+								if (chain != 0) {
+									empty = countNextEmptyFields(
+											(byte) (i + (7 * chain)), (byte) 5);
+									for (byte dist = 1; dist <= empty; ++dist) {
+										moves.add(new Movement(i, dist,
+												(byte) 5, chain));
+									}
+								}
+							} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+								empty = countNextEmptyFields(i, (byte) 5);
+								for (byte dist = 1; dist <= empty; ++dist) {
+									moves.add(new Movement(i, dist, (byte) 5,
+											(byte) 0));
+								}
+							}
+						}
+
+						/* ************************************************** */
+					}
+				} else if ((forwardMoves && player == player2)
+						|| (backwardMoves && player == player1)) {
+					/* ******************* angle == 0 ******************* */
+					temp = (byte) ((byte) i - 8);
+					if (temp >= 0) {
+						if ((playerBoard & fieldsMasks[temp]) != 0) {
+							chain = getChainLength(i, (byte) 0);
+							if (chain != 0) {
+								empty = countNextEmptyFields(
+										(byte) (i - (chain * 8)), (byte) 0);
+								for (byte dist = 1; dist <= empty; ++dist) {
+									moves.add(new Movement(i, dist, (byte) 0,
+											chain));
+								}
+							}
+						} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+							empty = countNextEmptyFields(i, (byte) 0);
+							for (byte dist = 1; dist <= empty; ++dist) {
+								moves.add(new Movement(i, dist, (byte) 0,
+										(byte) 0));
+							}
+						}
+					}
+					/* ************************************************** */
+
+					/* ******************* angle == 1 ******************* */
+					temp = (byte) ((byte) i - 7);
+					if (temp >= 0) {
+						if ((playerBoard & fieldsMasks[temp]) != 0) {
+							chain = getChainLength(i, (byte) 1);
+							if (chain != 0) {
+								empty = countNextEmptyFields(
+										(byte) (i - (chain * 7)), (byte) 1);
+								for (byte dist = 1; dist <= empty; ++dist) {
+									moves.add(new Movement(i, dist, (byte) 1,
+											chain));
+								}
+							}
+						} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+							empty = countNextEmptyFields(i, (byte) 1);
+							for (byte dist = 1; dist <= empty; ++dist) {
+								moves.add(new Movement(i, dist, (byte) 1,
+										(byte) 0));
+							}
+						}
+					}
+					/* ************************************************** */
+
+					/* ******************* angle == 7 ******************* */
+					temp = (byte) ((byte) i - 9);
+					if (temp >= 0) {
+						if ((playerBoard & fieldsMasks[temp]) != 0) {
+							chain = getChainLength(i, (byte) 7);
+							if (chain != 0) {
+								empty = countNextEmptyFields(
+										(byte) (i - (chain * 9)), (byte) 7);
+								for (byte dist = 1; dist <= empty; ++dist) {
+									moves.add(new Movement(i, dist, (byte) 7,
+											chain));
+								}
+							}
+						} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+							empty = countNextEmptyFields(i, (byte) 7);
+							for (byte dist = 1; dist <= empty; ++dist) {
+								moves.add(new Movement(i, dist, (byte) 7,
+										(byte) 0));
+							}
+						}
+					}
+					/* ************************************************** */
+				} else {
+					/* ******************* angle == 2 ******************* */
+
+					temp = (byte) ((byte) i + 1);
+					if (temp < 64 && (temp / 8) == (temp / 8)) {
+						if ((playerBoard & fieldsMasks[temp]) != 0) {
+							chain = getChainLength(i, (byte) 2);
+							if (chain != 0) {
+								empty = countNextEmptyFields(
+										(byte) (i + chain), (byte) 2);
+								for (byte dist = 1; dist <= empty; ++dist) {
+									moves.add(new Movement(i, dist, (byte) 2,
+											chain));
+								}
+							}
+						} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+							empty = countNextEmptyFields(i, (byte) 2);
+							for (byte dist = 1; dist <= empty; ++dist) {
+								moves.add(new Movement(i, dist, (byte) 2,
+										(byte) 0));
+							}
+						}
+					}
+
+					/* ************************************************** */
+
+					/* ******************* angle == 6 ******************* */
+
+					temp = (byte) ((byte) i - 1);
+					if (temp >= 0 && (temp / 8) == (temp / 8)) {
+						if ((playerBoard & fieldsMasks[temp]) != 0) {
+							chain = getChainLength(i, (byte) 6);
+							if (chain != 0) {
+								empty = countNextEmptyFields(
+										(byte) (i - chain), (byte) 6);
+								for (byte dist = 1; dist <= empty; ++dist) {
+									moves.add(new Movement(i, dist, (byte) 6,
+											chain));
+								}
+							}
+						} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+							empty = countNextEmptyFields(i, (byte) 6);
+							for (byte dist = 1; dist <= empty; ++dist) {
+								moves.add(new Movement(i, dist, (byte) 6,
+										(byte) 0));
+							}
+						}
+					}
+
+					/* ************************************************** */
+				}
+			}
+			++stage;
+		}
+		return moves;
 	}
-	
+
 	/**
 	 * Makes move on board.
 	 * 
@@ -1322,11 +1321,13 @@ public class Board implements Serializable {
 		board.makeMove(move);
 		return board;
 	}
-	
+
 	/**
 	 * Returns all possible moves that can resolve lock.<br>
 	 * <i>Checks only 2 last (for given player) rows of board.<i>
-	 * @param player Player who wants to resolve lock.
+	 * 
+	 * @param player
+	 *            Player who wants to resolve lock.
 	 * @return Possible moves.
 	 */
 	public List<Movement> resolveLock(byte player) {
@@ -1335,26 +1336,26 @@ public class Board implements Serializable {
 		byte step = 0;
 		byte start = 0;
 		byte stop = 0;
-		
+
 		if (player == player1) {
 			enemy = player2;
 			step = -1;
 			start = 48;
 			stop = 64;
-		}
-		else {
+		} else {
 			enemy = player1;
 			step = 1;
 			start = 0;
 			stop = 16;
 		}
-		
+
 		for (byte i = start; i < stop; ++i) {
 			if (get(i) == enemy) {
-				moves.addAll(getPawnPossibleMoves(player, (byte) (i + (step * 8))));
+				moves.addAll(getPawnPossibleMoves(player,
+						(byte) (i + (step * 8))));
 			}
 		}
-		
+		Collections.shuffle(moves);
 		return moves;
 	}
 

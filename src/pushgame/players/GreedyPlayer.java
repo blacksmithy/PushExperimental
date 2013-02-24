@@ -18,12 +18,8 @@ public class GreedyPlayer extends Player {
 
 	@Override
 	public Movement makeMove(Board board) {
-		System.out.println("ID = " + id);
-		
 		Movement decision = null;
 		List<Movement> moves = board.getPossibleMoves(id);
-		
-		
 		
 		List<Movement> lockPreventionMoves = null;
 		Oracle oracle = new DistancesOracle();
@@ -38,7 +34,6 @@ public class GreedyPlayer extends Player {
 			if (! lockPreventionMoves.isEmpty()) {
 				moves = lockPreventionMoves;
 			}
-			
 		}
 		else if (id == player2 &&  ((decision.getAngle() != 7) && (decision.getAngle() != 0) && (decision.getAngle() != 1))) {
 			System.out.println("LOCK! @ " + decision.getAngle());
@@ -46,7 +41,6 @@ public class GreedyPlayer extends Player {
 			if (! lockPreventionMoves.isEmpty()) {
 				moves = lockPreventionMoves;
 			}
-			
 		}
 		
 		short max = Short.MIN_VALUE;
