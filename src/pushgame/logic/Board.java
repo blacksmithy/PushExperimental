@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import pushgame.util.GlobalSettings;
+import pushgame.util.HashHelper;
 
 public class Board implements Serializable {
 
@@ -20,6 +21,8 @@ public class Board implements Serializable {
 	 * Stores player2's pawns positions.
 	 */
 	private long player2Board;
+	
+	private long hash;
 	/**
 	 * Player1's id.
 	 */
@@ -66,6 +69,7 @@ public class Board implements Serializable {
 	public Board() {
 		player1Board = 0;
 		player2Board = 0;
+		hash = 0;
 	}
 
 	/**
@@ -77,6 +81,7 @@ public class Board implements Serializable {
 	public Board(Board board) {
 		this.player1Board = board.player1Board;
 		this.player2Board = board.player2Board;
+		this.hash = board.hash;
 	}
 
 	/**
@@ -1205,15 +1210,19 @@ public class Board implements Serializable {
 	 *            Move to make.
 	 */
 	public void makeMove(Movement move) {
-		int originVal = get(move.getOrigin());
+		byte originVal = get(move.getOrigin());
 
 		if (move.chain == 0) {
 			if (originVal == player1) {
 				player1Board = player1Board & fieldsMasksZero[move.origin];
 				player1Board = player1Board | fieldsMasks[move.destination];
+				
+				updateHashAfterMove(move.origin, move.destination, player1);
 			} else {
 				player2Board = player2Board & fieldsMasksZero[move.origin];
 				player2Board = player2Board | fieldsMasks[move.destination];
+				
+				updateHashAfterMove(move.origin, move.destination, player2);
 			}
 			return;
 		}
@@ -1234,6 +1243,8 @@ public class Board implements Serializable {
 				tempTo = (byte) (move.destination - (i * 8));
 				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
 				playerBoard = playerBoard | fieldsMasks[tempTo];
+			
+				updateHashAfterMove(tempFrom, tempTo, originVal);
 			}
 			break;
 
@@ -1243,6 +1254,8 @@ public class Board implements Serializable {
 				tempTo = (byte) (move.destination - (i * 7));
 				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
 				playerBoard = playerBoard | fieldsMasks[tempTo];
+				
+				updateHashAfterMove(tempFrom, tempTo, originVal);
 			}
 			break;
 
@@ -1252,6 +1265,8 @@ public class Board implements Serializable {
 				tempTo = (byte) (move.destination + i);
 				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
 				playerBoard = playerBoard | fieldsMasks[tempTo];
+				
+				updateHashAfterMove(tempFrom, tempTo, originVal);
 			}
 			break;
 
@@ -1261,6 +1276,8 @@ public class Board implements Serializable {
 				tempTo = (byte) (move.destination + (i * 9));
 				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
 				playerBoard = playerBoard | fieldsMasks[tempTo];
+				
+				updateHashAfterMove(tempFrom, tempTo, originVal);
 			}
 			break;
 
@@ -1270,6 +1287,8 @@ public class Board implements Serializable {
 				tempTo = (byte) (move.destination + (i * 8));
 				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
 				playerBoard = playerBoard | fieldsMasks[tempTo];
+				
+				updateHashAfterMove(tempFrom, tempTo, originVal);
 			}
 			break;
 
@@ -1279,6 +1298,8 @@ public class Board implements Serializable {
 				tempTo = (byte) (move.destination + (i * 7));
 				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
 				playerBoard = playerBoard | fieldsMasks[tempTo];
+				
+				updateHashAfterMove(tempFrom, tempTo, originVal);
 			}
 			break;
 
@@ -1288,6 +1309,8 @@ public class Board implements Serializable {
 				tempTo = (byte) (move.destination - i);
 				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
 				playerBoard = playerBoard | fieldsMasks[tempTo];
+				
+				updateHashAfterMove(tempFrom, tempTo, originVal);
 			}
 			break;
 
@@ -1297,11 +1320,15 @@ public class Board implements Serializable {
 				tempTo = (byte) (move.destination - (i * 9));
 				playerBoard = playerBoard & fieldsMasksZero[tempFrom];
 				playerBoard = playerBoard | fieldsMasks[tempTo];
+				
+				updateHashAfterMove(tempFrom, tempTo, originVal);
 			}
 			break;
 		}
 		playerBoard = playerBoard & fieldsMasksZero[move.origin];
 		playerBoard = playerBoard | fieldsMasks[move.destination];
+		
+		updateHashAfterMove(move.origin, move.destination, originVal);
 
 		if (originVal == player1)
 			player1Board = playerBoard;
@@ -1359,4 +1386,12 @@ public class Board implements Serializable {
 		return moves;
 	}
 
+	public long getHash() {
+		return this.hash;
+	}
+	
+	public void updateHashAfterMove(byte from, byte to, byte player) {
+		this.hash ^= HashHelper.ZOBRIST_KEYS[player-1][from];
+		this.hash ^= HashHelper.ZOBRIST_KEYS[player-1][to];
+	}
 }

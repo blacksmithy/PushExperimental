@@ -2,6 +2,8 @@ package pushgame.players;
 
 import javax.swing.JComboBox;
 
+import pushgame.util.GameConfig;
+
 
 public class PlayerFactory
 {
@@ -28,7 +30,7 @@ public class PlayerFactory
 		cb.addItem(RANDOM_AI);
 		cb.addItem(GREEDY_AI);
 		cb.addItem(ALPHA_BETA_AI);
-//		cb.addItem(FS_ALPHA_BETA);
+		cb.addItem(FS_ALPHA_BETA);
 //		cb.addItem(FS_ALPHA_BETA_TT);
 //		cb.addItem(ELF_TEST);
 //		cb.addItem(BLS_TEST);
@@ -40,8 +42,11 @@ public class PlayerFactory
 		{
 			cb.removeAllItems();
 			cb.addItem(2);
+			cb.addItem(3);
 			cb.addItem(4);
+			cb.addItem(5);
 			cb.addItem(6);
+			cb.addItem(7);
 			if(aiID==1)
 			{
 				cb.setSelectedItem(depthAI1);
@@ -89,15 +94,18 @@ public class PlayerFactory
 	{
 		String ai="";
 		Integer md=0;
+		GameConfig config = GameConfig.getInstance();
 		if(id==1)
 		{
 			ai=algoAI1;
 			md=depthAI1;
+			config.setAi1Depth(Short.valueOf(depthAI1.toString()));
 		}
 		else if(id==2)
 		{
 			ai=algoAI2;
 			md=depthAI2;
+			config.setAi2Depth(Short.valueOf(depthAI2.toString()));
 		}
 		
 		Player result=null;
@@ -116,6 +124,14 @@ public class PlayerFactory
 		else if(ai == ALPHA_BETA_AI)
 		{
 			result=new AlphaBetaPlayer(id, delay);
+		}
+		else if(ai == FS_ALPHA_BETA)
+		{
+			result = new FsAlphaBetaPlayer(id, delay);
+		}
+		else if(ai == FS_ALPHA_BETA_TT)
+		{
+			result = new TtFsAlphaBetaPlayer(id, delay);
 		}
 		md++;
 		return result;

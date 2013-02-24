@@ -9,20 +9,20 @@ import pushgame.oracle.SymmetricDistancesOracle;
 import pushgame.util.AlphaBetaThreadEndEvent;
 import pushgame.util.GameConfig;
 
-public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
+public class FsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 
 	private Oracle oracle;
 	private Oracle oracle2;
 	private short[] threadReturn;
-	private AlphaBetaThread[] threads;
+	private FsAlphaBetaThread[] threads;
 	private boolean forceOneThread = true;
 	
-	public AlphaBetaPlayer(byte id, int delay) {
+	public FsAlphaBetaPlayer(byte id, int delay) {
 		super(id, delay);
 		oracle = new SymmetricDistancesOracle();
 		oracle2 = new SymmetricDistancesOracle();
 		threadReturn = new short[2];
-		threads = new AlphaBetaThread[2];
+		threads = new FsAlphaBetaThread[2];
 	}
 
 	@Override
@@ -48,10 +48,10 @@ public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 		for (int i = 0; i < moves.size(); i += iterStep) {
 			System.out.println("->" + i);
 			
-			threads[0] = new AlphaBetaThread((byte) 0, oracle, board.getBoardCopyAfterMove(moves.get(i)), this, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
+			threads[0] = new FsAlphaBetaThread((byte) 0, oracle, board.getBoardCopyAfterMove(moves.get(i)), this, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
 			threads[0].run();
 			if (! forceOneThread && (i + 1 < moves.size())) {
-				threads[1] = new AlphaBetaThread((byte) 1, oracle2, board.getBoardCopyAfterMove(moves.get(i+1)), this, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
+				threads[1] = new FsAlphaBetaThread((byte) 1, oracle2, board.getBoardCopyAfterMove(moves.get(i+1)), this, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
 				threads[1].run();
 			}
 			
@@ -109,7 +109,7 @@ public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 
 }
 
-class AlphaBetaThread extends Thread {
+class FsAlphaBetaThread extends Thread {
 	private byte threadId;
 	private Oracle oracle;
 	private Board board;
@@ -119,7 +119,7 @@ class AlphaBetaThread extends Thread {
 	private short beta;
 	private byte player;
 	
-	public AlphaBetaThread(byte threadId, Oracle oracle, Board board,
+	public FsAlphaBetaThread(byte threadId, Oracle oracle, Board board,
 			AlphaBetaThreadEndEvent event, short depth, short alpha, short beta,
 			byte player) {
 		super();
@@ -139,19 +139,23 @@ class AlphaBetaThread extends Thread {
 			return this.oracle.getProphecy(this.board, inputBoard, null, player);
 		}
 		
+		short best = Short.MIN_VALUE;
+		
 		List<Movement> moves = inputBoard.getPossibleMoves(player);
 		
 		short value = 0;
 		
 		for (Movement m : moves) {
 			value = (short) -alphaBeta(inputBoard.getBoardCopyAfterMove(m), (short) (depth-1), (short) (-beta), (short) (-alpha), (byte) (3 - player));
-			if (value > alpha)
-				alpha = value;
-			if (alpha >= beta) {
-				return beta;
+			if (value > best)
+				best = value;
+			if (best >= beta) {
+				break;
 			}
+			if (best > alpha)
+				alpha = best;
 		}
-		return alpha;
+		return best;
 	}
 	
 	public void run() {

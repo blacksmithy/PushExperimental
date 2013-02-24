@@ -98,6 +98,9 @@ class EditObserver extends Thread implements FieldListener
 					{
 						currBoard.set(field, currBoard.get(currField));
 						currBoard.set(currField, (byte) 0);
+						
+						currBoard.updateHashAfterMove(currField, field, currBoard.get(field));
+						
 						currField=null;
 						dests=null;
 						return null;

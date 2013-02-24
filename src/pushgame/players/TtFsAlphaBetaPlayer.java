@@ -8,21 +8,23 @@ import pushgame.oracle.Oracle;
 import pushgame.oracle.SymmetricDistancesOracle;
 import pushgame.util.AlphaBetaThreadEndEvent;
 import pushgame.util.GameConfig;
+import pushgame.util.Transposition;
+import pushgame.util.TranspositionTable;
 
-public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
+public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 
 	private Oracle oracle;
 	private Oracle oracle2;
 	private short[] threadReturn;
-	private AlphaBetaThread[] threads;
+	private TtFsAlphaBetaThread[] threads;
 	private boolean forceOneThread = true;
 	
-	public AlphaBetaPlayer(byte id, int delay) {
+	public TtFsAlphaBetaPlayer(byte id, int delay) {
 		super(id, delay);
 		oracle = new SymmetricDistancesOracle();
 		oracle2 = new SymmetricDistancesOracle();
 		threadReturn = new short[2];
-		threads = new AlphaBetaThread[2];
+		threads = new TtFsAlphaBetaThread[2];
 	}
 
 	@Override
@@ -32,6 +34,8 @@ public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 			depth = GameConfig.getInstance().getAi1Depth();//6;
 		else
 			depth = GameConfig.getInstance().getAi2Depth();
+		
+		TranspositionTable tt = new TranspositionTable();
 		
 		Movement decision = null;
 		short decisionValue = Short.MIN_VALUE;
@@ -48,10 +52,10 @@ public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 		for (int i = 0; i < moves.size(); i += iterStep) {
 			System.out.println("->" + i);
 			
-			threads[0] = new AlphaBetaThread((byte) 0, oracle, board.getBoardCopyAfterMove(moves.get(i)), this, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
+			threads[0] = new TtFsAlphaBetaThread((byte) 0, oracle, board.getBoardCopyAfterMove(moves.get(i)), this, tt, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
 			threads[0].run();
 			if (! forceOneThread && (i + 1 < moves.size())) {
-				threads[1] = new AlphaBetaThread((byte) 1, oracle2, board.getBoardCopyAfterMove(moves.get(i+1)), this, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
+				threads[1] = new TtFsAlphaBetaThread((byte) 1, oracle2, board.getBoardCopyAfterMove(moves.get(i+1)), this, tt, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
 				threads[1].run();
 			}
 			
@@ -109,24 +113,26 @@ public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 
 }
 
-class AlphaBetaThread extends Thread {
+class TtFsAlphaBetaThread extends Thread {
 	private byte threadId;
 	private Oracle oracle;
 	private Board board;
 	private AlphaBetaThreadEndEvent event;
+	private TranspositionTable tt;
 	private short depth;
 	private short alpha;
 	private short beta;
 	private byte player;
 	
-	public AlphaBetaThread(byte threadId, Oracle oracle, Board board,
-			AlphaBetaThreadEndEvent event, short depth, short alpha, short beta,
+	public TtFsAlphaBetaThread(byte threadId, Oracle oracle, Board board,
+			AlphaBetaThreadEndEvent event, TranspositionTable tt, short depth, short alpha, short beta,
 			byte player) {
 		super();
 		this.threadId = threadId;
 		this.oracle = oracle;
 		this.board = board;
 		this.event = event;
+		this.tt = tt;
 		this.depth = depth;
 		this.alpha = alpha;
 		this.beta = beta;
@@ -139,19 +145,51 @@ class AlphaBetaThread extends Thread {
 			return this.oracle.getProphecy(this.board, inputBoard, null, player);
 		}
 		
+		Transposition t = tt.get(inputBoard.getHash());
+		if (t != null) { // jeśli znaleziono coś w tablicy transpozycji
+			System.out.println("HIT!");
+			if (t.getDepth() >= depth) { // i wynik może mieć znaczenie na tym poziomie
+				if (t.getType() == Transposition.VALUE_LOWER)
+					alpha = (short) Math.max(alpha, t.getValue());
+				else if (t.getType() == Transposition.VALUE_UPPER)
+					beta = (short) Math.min(beta, t.getValue());
+				else {
+					alpha = t.getValue();
+					beta = t.getValue();
+				}
+			}
+			if (alpha >= beta) // odcięcie
+				return t.getValue();
+		}
+		else {
+			System.out.println("NO HIT :(");
+		}
+		
+		short best = Short.MIN_VALUE;
+		boolean bestFound = false;
 		List<Movement> moves = inputBoard.getPossibleMoves(player);
 		
 		short value = 0;
 		
 		for (Movement m : moves) {
 			value = (short) -alphaBeta(inputBoard.getBoardCopyAfterMove(m), (short) (depth-1), (short) (-beta), (short) (-alpha), (byte) (3 - player));
-			if (value > alpha)
-				alpha = value;
-			if (alpha >= beta) {
-				return beta;
+			if (value > best)
+				best = value;
+				bestFound = true;
+			if (best >= beta) {
+				break;
 			}
+			if (best > alpha)
+				alpha = best;
 		}
-		return alpha;
+		
+		if (bestFound) {
+			System.out.println("HASH = " + inputBoard.getHash());
+			tt.put(new Transposition(best, depth, alpha, beta), inputBoard.getHash());
+			System.out.println("TT_SIZE = " + tt.getSize());
+		}
+		
+		return best;
 	}
 	
 	public void run() {
