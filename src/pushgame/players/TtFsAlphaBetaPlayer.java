@@ -147,7 +147,7 @@ class TtFsAlphaBetaThread extends Thread {
 		
 		Transposition t = tt.get(inputBoard.getHash());
 		if (t != null) { // jeśli znaleziono coś w tablicy transpozycji
-			System.out.println("HIT!");
+			//System.out.println("HIT!");
 			if (t.getDepth() >= depth) { // i wynik może mieć znaczenie na tym poziomie
 				if (t.getType() == Transposition.VALUE_LOWER)
 					alpha = (short) Math.max(alpha, t.getValue());
@@ -160,9 +160,6 @@ class TtFsAlphaBetaThread extends Thread {
 			}
 			if (alpha >= beta) // odcięcie
 				return t.getValue();
-		}
-		else {
-			System.out.println("NO HIT :(");
 		}
 		
 		short best = Short.MIN_VALUE;
@@ -184,9 +181,9 @@ class TtFsAlphaBetaThread extends Thread {
 		}
 		
 		if (bestFound) {
-			System.out.println("HASH = " + inputBoard.getHash());
+			//System.out.println("HASH = " + inputBoard.getHash());
 			tt.put(new Transposition(best, depth, alpha, beta), inputBoard.getHash());
-			System.out.println("TT_SIZE = " + tt.getSize());
+			//System.out.println("TT_SIZE = " + tt.getSize());
 		}
 		
 		return best;

@@ -31,7 +31,7 @@ public class PlayerFactory
 		cb.addItem(GREEDY_AI);
 		cb.addItem(ALPHA_BETA_AI);
 		cb.addItem(FS_ALPHA_BETA);
-//		cb.addItem(FS_ALPHA_BETA_TT);
+		cb.addItem(FS_ALPHA_BETA_TT);
 //		cb.addItem(ELF_TEST);
 //		cb.addItem(BLS_TEST);
 	}
@@ -41,6 +41,7 @@ public class PlayerFactory
 		if(algo==ALPHA_BETA_AI || algo == FS_ALPHA_BETA || algo == FS_ALPHA_BETA_TT)
 		{
 			cb.removeAllItems();
+			cb.addItem(1);
 			cb.addItem(2);
 			cb.addItem(3);
 			cb.addItem(4);

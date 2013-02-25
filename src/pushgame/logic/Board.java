@@ -21,7 +21,9 @@ public class Board implements Serializable {
 	 * Stores player2's pawns positions.
 	 */
 	private long player2Board;
-	
+	/**
+	 * Board's hash.
+	 */
 	private long hash;
 	/**
 	 * Player1's id.

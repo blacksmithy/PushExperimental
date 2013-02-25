@@ -6,6 +6,7 @@ import pushgame.logic.Board;
 import pushgame.logic.Movement;
 import pushgame.oracle.Oracle;
 import pushgame.oracle.SymmetricDistancesOracle;
+import pushgame.oracle.SymmetricWeightedOracle;
 import pushgame.util.AlphaBetaThreadEndEvent;
 import pushgame.util.GameConfig;
 
@@ -15,12 +16,14 @@ public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 	private Oracle oracle2;
 	private short[] threadReturn;
 	private AlphaBetaThread[] threads;
-	private boolean forceOneThread = true;
+	private boolean forceOneThread = false;
 	
 	public AlphaBetaPlayer(byte id, int delay) {
 		super(id, delay);
 		oracle = new SymmetricDistancesOracle();
 		oracle2 = new SymmetricDistancesOracle();
+//		oracle = new SymmetricWeightedOracle();
+//		oracle2 = new SymmetricWeightedOracle();
 		threadReturn = new short[2];
 		threads = new AlphaBetaThread[2];
 	}
