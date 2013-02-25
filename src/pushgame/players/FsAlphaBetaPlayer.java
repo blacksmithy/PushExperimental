@@ -1,5 +1,7 @@
 package pushgame.players;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import pushgame.logic.Board;
@@ -8,6 +10,7 @@ import pushgame.oracle.Oracle;
 import pushgame.oracle.SymmetricDistancesOracle;
 import pushgame.util.AlphaBetaThreadEndEvent;
 import pushgame.util.GameConfig;
+import pushgame.util.MovementComparator;
 
 public class FsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 
@@ -16,6 +19,10 @@ public class FsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent
 	private short[] threadReturn;
 	private FsAlphaBetaThread[] threads;
 	private boolean forceOneThread = true;
+	
+	private int firstMoves = 0;
+	private int firstMovesNum = 2;
+	private boolean sortEnable = true;	
 	
 	public FsAlphaBetaPlayer(byte id, int delay) {
 		super(id, delay);
@@ -38,7 +45,42 @@ public class FsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent
 		short alpha = Short.MIN_VALUE + 2;
 		short beta = Short.MAX_VALUE - 1;
 		
+		/* ***************** Generating possible moves ***************** */
 		List<Movement> moves = board.getPossibleMoves(id);
+		
+		if ((id == 1 && board.getPlayer1BoardValue() == board.getPlayer1Initial()) || firstMoves != 0) {
+			if (firstMoves == 0) {
+				firstMoves = firstMovesNum - 1;
+			}
+			else {
+				--firstMoves;
+			}
+			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
+			for (Movement m : moves) {
+				if (!(m.getChain() < 1 || m.getDistance() != 3))
+					moves2.add(m);
+			}
+			moves = moves2;
+		}
+		else if ((id == 2 && board.getPlayer2BoardValue() == board.getPlayer2Initial()) || firstMoves != 0) {
+			if (firstMoves == 0) {
+				firstMoves = firstMovesNum - 1;
+			}
+			else {
+				--firstMoves;
+			}
+			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
+			for (Movement m : moves) {
+				if (!(m.getChain() < 1 || m.getDistance() != 3))
+					moves2.add(m);
+			}
+			moves = moves2;
+		}
+		
+		sortEnable = GameConfig.getInstance().isSortEnabled();
+		if (sortEnable)
+			Collections.sort(moves, new MovementComparator());
+		/* ************************************************************* */
 		
 		int iterStep = 2;
 		if (forceOneThread) {

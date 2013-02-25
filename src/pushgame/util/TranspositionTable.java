@@ -1,13 +1,17 @@
 package pushgame.util;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class TranspositionTable {
 
-	private ConcurrentHashMap<Long, Transposition> map;
+	private HashMap<Long, Transposition> map;
+	private HashSet<Long> purgatory;
+	private int limit = 5000;
 	
 	public TranspositionTable() {
-		map = new ConcurrentHashMap<Long, Transposition>();
+		map = new HashMap<Long, Transposition>();
+		purgatory = new HashSet<Long>();
 	}
 	
 	public Transposition get(long hash) {		
@@ -15,14 +19,29 @@ public class TranspositionTable {
 	}
 	
 	public void put(Transposition transposition, long hash) {
-		if (map.contains(hash)) {
-			map.remove(hash);
+		if (purgatory.size() > limit) {
+//			System.out.println("CLEAR!");
+			purgatory.clear();
 		}
-		map.put(hash, transposition);
+
+		if (purgatory.contains(hash)) { // adding new value to map
+			purgatory.remove(hash);
+			map.put(hash, transposition);
+		}
+		else {
+			if (map.containsKey(hash)) {
+				map.remove(hash);
+				map.put(hash, transposition);
+			}
+			else {
+				purgatory.add(hash);
+			}
+			
+		}
 	}
 	
 	public void remove(long hash) {
-		if (map.contains(hash)) {
+		if (map.containsKey(hash)) {
 			map.remove(hash);
 		}
 	}

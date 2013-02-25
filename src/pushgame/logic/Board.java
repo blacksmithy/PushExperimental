@@ -1396,4 +1396,20 @@ public class Board implements Serializable {
 		this.hash ^= HashHelper.ZOBRIST_KEYS[player-1][from];
 		this.hash ^= HashHelper.ZOBRIST_KEYS[player-1][to];
 	}
+	
+	public long getPlayer1Initial() {
+		return player1Initial;
+	}
+	
+	public long getPlayer2Initial() {
+		return player2Initial;
+	}
+	
+	public long getPlayer1BoardValue() {
+		return this.player1Board;
+	}
+	
+	public long getPlayer2BoardValue() {
+		return this.player2Board;
+	}
 }

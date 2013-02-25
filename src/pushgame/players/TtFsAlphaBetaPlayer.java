@@ -1,5 +1,7 @@
 package pushgame.players;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import pushgame.logic.Board;
@@ -8,6 +10,7 @@ import pushgame.oracle.Oracle;
 import pushgame.oracle.SymmetricDistancesOracle;
 import pushgame.util.AlphaBetaThreadEndEvent;
 import pushgame.util.GameConfig;
+import pushgame.util.MovementComparator;
 import pushgame.util.Transposition;
 import pushgame.util.TranspositionTable;
 
@@ -17,7 +20,11 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 	private Oracle oracle2;
 	private short[] threadReturn;
 	private TtFsAlphaBetaThread[] threads;
-	private boolean forceOneThread = true;
+	private boolean forceOneThread = true;	
+	
+	private int firstMoves = 0;
+	private int firstMovesNum = 2;
+	private boolean sortEnable = true;
 	
 	public TtFsAlphaBetaPlayer(byte id, int delay) {
 		super(id, delay);
@@ -42,7 +49,42 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 		short alpha = Short.MIN_VALUE + 2;
 		short beta = Short.MAX_VALUE - 1;
 		
+		/* ***************** Generating possible moves ***************** */
 		List<Movement> moves = board.getPossibleMoves(id);
+		
+		if ((id == 1 && board.getPlayer1BoardValue() == board.getPlayer1Initial()) || firstMoves != 0) {
+			if (firstMoves == 0) {
+				firstMoves = firstMovesNum - 1;
+			}
+			else {
+				--firstMoves;
+			}
+			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
+			for (Movement m : moves) {
+				if (!(m.getChain() < 1 || m.getDistance() != 3))
+					moves2.add(m);
+			}
+			moves = moves2;
+		}
+		else if ((id == 2 && board.getPlayer2BoardValue() == board.getPlayer2Initial()) || firstMoves != 0) {
+			if (firstMoves == 0) {
+				firstMoves = firstMovesNum - 1;
+			}
+			else {
+				--firstMoves;
+			}
+			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
+			for (Movement m : moves) {
+				if (!(m.getChain() < 1 || m.getDistance() != 3))
+					moves2.add(m);
+			}
+			moves = moves2;
+		}
+		
+		sortEnable = GameConfig.getInstance().isSortEnabled();
+		if (sortEnable)
+			Collections.sort(moves, new MovementComparator());
+		/* ************************************************************* */
 		
 		int iterStep = 2;
 		if (forceOneThread) {
@@ -148,6 +190,7 @@ class TtFsAlphaBetaThread extends Thread {
 		Transposition t = tt.get(inputBoard.getHash());
 		if (t != null) { // jeśli znaleziono coś w tablicy transpozycji
 			//System.out.println("HIT!");
+			
 			if (t.getDepth() >= depth) { // i wynik może mieć znaczenie na tym poziomie
 				if (t.getType() == Transposition.VALUE_LOWER)
 					alpha = (short) Math.max(alpha, t.getValue());
@@ -185,7 +228,6 @@ class TtFsAlphaBetaThread extends Thread {
 			tt.put(new Transposition(best, depth, alpha, beta), inputBoard.getHash());
 			//System.out.println("TT_SIZE = " + tt.getSize());
 		}
-		
 		return best;
 	}
 	

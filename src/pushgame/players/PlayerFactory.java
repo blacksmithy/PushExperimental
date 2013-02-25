@@ -15,6 +15,8 @@ public class PlayerFactory
 	static final public String FS_ALPHA_BETA_TT = "AI alfa-beta FS TT";
 	static final public String BLS_TEST = "Algo BLS";
 	static final public String ELF_TEST = "Algo ELF";
+	static final public String C_STAR = "C* + TT";
+	static final public String MTD = "MTD(f) + TT";
 	
 	
 	static public String algoAI1=RANDOM_AI;
@@ -32,13 +34,15 @@ public class PlayerFactory
 		cb.addItem(ALPHA_BETA_AI);
 		cb.addItem(FS_ALPHA_BETA);
 		cb.addItem(FS_ALPHA_BETA_TT);
+		cb.addItem(C_STAR);
+		cb.addItem(MTD);
 //		cb.addItem(ELF_TEST);
 //		cb.addItem(BLS_TEST);
 	}
 	
 	static public void loadDepths(int aiID,String algo,JComboBox<Integer> cb)
 	{
-		if(algo==ALPHA_BETA_AI || algo == FS_ALPHA_BETA || algo == FS_ALPHA_BETA_TT)
+		if(algo==ALPHA_BETA_AI || algo == FS_ALPHA_BETA || algo == FS_ALPHA_BETA_TT || algo == C_STAR || algo == MTD)
 		{
 			cb.removeAllItems();
 			cb.addItem(1);
@@ -133,6 +137,14 @@ public class PlayerFactory
 		else if(ai == FS_ALPHA_BETA_TT)
 		{
 			result = new TtFsAlphaBetaPlayer(id, delay);
+		}
+		else if(ai == C_STAR)
+		{
+			result = new CstarPlayer(id, delay);
+		}
+		else if(ai == MTD)
+		{
+			result = new MtdPlayer(id, delay);
 		}
 		md++;
 		return result;
