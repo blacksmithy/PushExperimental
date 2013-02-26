@@ -11,8 +11,8 @@ public class MovementComparator implements Comparator<Movement> {
 
 	@Override
 	public int compare(Movement m1, Movement m2) {
-		int val1 = m1.getChain() * m1.getDistance();
-		int val2 = m2.getChain() * m2.getDistance();
+		int val1 = (m1.getChain() + 1) * m1.getDistance();
+		int val2 = (m2.getChain() + 1) * m2.getDistance();
 	
 		if (val1 > val2)// DESC!!
 			return -1;

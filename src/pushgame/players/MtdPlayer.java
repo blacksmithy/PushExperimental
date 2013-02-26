@@ -64,6 +64,8 @@ public class MtdPlayer extends Player {
 					.getProphecy(this.board, inputBoard, null, player);
 		}
 
+		List<Movement> moves;
+		
 		Transposition t = tt.get(inputBoard.getHash());
 		if (t != null) { // jeśli znaleziono coś w tablicy transpozycji
 			if (t.getDepth() >= depth) { // i wynik może mieć znaczenie na tym
@@ -79,21 +81,34 @@ public class MtdPlayer extends Player {
 			}
 			if (alpha >= beta) // odcięcie
 				return t.getValue();
+			
+			moves = inputBoard.getPossibleMoves(player);
+			
+			int idx = moves.indexOf(t.getNextBest());
+			if (idx != -1 && idx != 0) {
+				Collections.swap(moves, idx, 0);
+			}
+		}
+		else {
+			moves = inputBoard.getPossibleMoves(player);
 		}
 
 		short best = Short.MIN_VALUE;
 		boolean bestFound = false;
-		List<Movement> moves = inputBoard.getPossibleMoves(player);
-
+		
 		short value = 0;
+		
+		Movement nextBest = null;
 
 		for (Movement m : moves) {
 			value = (short) -alphaBeta(inputBoard.getBoardCopyAfterMove(m),
 					(short) (depth - 1), (short) (-beta), (short) (-alpha),
 					(byte) (3 - player));
-			if (value > best)
+			if (value > best) {
 				best = value;
-			bestFound = true;
+				nextBest = m;
+				bestFound = true;
+			}
 			if (best >= beta) {
 				break;
 			}
@@ -102,7 +117,7 @@ public class MtdPlayer extends Player {
 		}
 
 		if (bestFound) {
-			tt.put(new Transposition(best, depth, alpha, beta),
+			tt.put(new Transposition(best, depth, alpha, beta, nextBest),
 					inputBoard.getHash());
 		}
 		return best;

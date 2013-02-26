@@ -1,5 +1,7 @@
 package pushgame.util;
 
+import pushgame.logic.Movement;
+
 public class Transposition {
 
 	public static final byte VALUE_LOWER = (byte) 0;
@@ -9,16 +11,18 @@ public class Transposition {
 	private short value;
 	private byte type;
 	private short depth;
+	private Movement nextBest;
 	
 	
-	public Transposition(short value, short depth, byte type) {
+	public Transposition(short value, short depth, byte type, Movement best) {
 		this.value = value;
 		this.depth = depth;
 		this.type = type;
+		this.nextBest = best;
 	}
 	
-	public Transposition(short value, short depth, short alpha, short beta) {
-		this(value, depth, VALUE_ACCURATE);
+	public Transposition(short value, short depth, short alpha, short beta, Movement best) {
+		this(value, depth, VALUE_ACCURATE, best);
 		if (value <= alpha)
 			type = VALUE_UPPER;
 		else if (value >= beta)
@@ -48,5 +52,12 @@ public class Transposition {
 	public void setDepth(short depth) {
 		this.depth = depth;
 	}
-	
+
+	public Movement getNextBest() {
+		return nextBest;
+	}
+
+	public void setNextBest(Movement nextBest) {
+		this.nextBest = nextBest;
+	}	
 }

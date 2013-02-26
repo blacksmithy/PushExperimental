@@ -3,13 +3,13 @@ package pushgame.util;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class TranspositionTable {
+public class CopyOfTranspositionTable {
 
 	private HashMap<Long, Transposition> map;
 	private HashSet<Long> purgatory;
 	private int limit = 5000;
 	
-	public TranspositionTable() {
+	public CopyOfTranspositionTable() {
 		map = new HashMap<Long, Transposition>(20000);
 		purgatory = new HashSet<Long>();
 	}

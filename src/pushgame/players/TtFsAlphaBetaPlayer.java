@@ -187,6 +187,8 @@ class TtFsAlphaBetaThread extends Thread {
 			return this.oracle.getProphecy(this.board, inputBoard, null, player);
 		}
 		
+		List<Movement> moves; // = inputBoard.getPossibleMoves(player);
+		
 		Transposition t = tt.get(inputBoard.getHash());
 		if (t != null) { // jeśli znaleziono coś w tablicy transpozycji
 			//System.out.println("HIT!");
@@ -203,19 +205,33 @@ class TtFsAlphaBetaThread extends Thread {
 			}
 			if (alpha >= beta) // odcięcie
 				return t.getValue();
+			
+			moves = inputBoard.getPossibleMoves(player);
+			
+			int idx = moves.indexOf(t.getNextBest());
+			if (idx != -1 && idx != 0) {
+				Collections.swap(moves, idx, 0);
+			}
+			//moves.add(t.getNextBest());
+		}
+		else {
+			moves = inputBoard.getPossibleMoves(player);
 		}
 		
 		short best = Short.MIN_VALUE;
 		boolean bestFound = false;
-		List<Movement> moves = inputBoard.getPossibleMoves(player);
+		
+		Movement nextBest = null;
 		
 		short value = 0;
 		
 		for (Movement m : moves) {
 			value = (short) -alphaBeta(inputBoard.getBoardCopyAfterMove(m), (short) (depth-1), (short) (-beta), (short) (-alpha), (byte) (3 - player));
-			if (value > best)
+			if (value > best) {
 				best = value;
+				nextBest = m;
 				bestFound = true;
+			}
 			if (best >= beta) {
 				break;
 			}
@@ -225,7 +241,7 @@ class TtFsAlphaBetaThread extends Thread {
 		
 		if (bestFound) {
 			//System.out.println("HASH = " + inputBoard.getHash());
-			tt.put(new Transposition(best, depth, alpha, beta), inputBoard.getHash());
+			tt.put(new Transposition(best, depth, alpha, beta, nextBest), inputBoard.getHash());
 			//System.out.println("TT_SIZE = " + tt.getSize());
 		}
 		return best;
