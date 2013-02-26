@@ -8,6 +8,9 @@ public class RandomPlayer extends Player {
 	public RandomPlayer(byte id, int delay) {
 		super(id, delay);
 		// TODO Auto-generated constructor stub
+		
+		this.statsMovesNum = 1;
+		this.statsVisitedNodes = 1;
 	}
 
 	@Override

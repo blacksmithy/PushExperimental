@@ -26,6 +26,9 @@ public class CstarPlayer extends Player {
 	public CstarPlayer(byte id, int delay) {
 		super(id, delay);
 		oracle = new SymmetricDistancesOracle();
+		
+		this.statsMovesNum = 1;
+		this.statsVisitedNodes = 1;
 	}
 
 	private short cStar(Board inputBoard, short depth, byte player) {

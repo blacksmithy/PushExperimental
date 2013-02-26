@@ -26,6 +26,9 @@ public class MtdPlayer extends Player {
 	public MtdPlayer(byte id, int delay) {
 		super(id, delay);
 		oracle = new SymmetricDistancesOracle();
+		
+		this.statsMovesNum = 1;
+		this.statsVisitedNodes = 1;
 	}
 
 	private short cStar(Board inputBoard, short f, short depth, byte player) {

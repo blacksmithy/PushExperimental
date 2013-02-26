@@ -68,6 +68,7 @@ public class Game {
 			
 			end = System.nanoTime();
 			System.out.println("P1 \"thinking\" time: " + ((end - start)) + "ns");
+			
 
 			board.makeMove(move);
 			boardPanel.getParent().repaint();
@@ -96,6 +97,7 @@ public class Game {
 			end = System.nanoTime();
 			System.out.println("P2 \"thinking\" time: " + ((end - start)) + "ns");
 			
+			
 			board.makeMove(move);
 			window.refreshBoard();
 			
@@ -106,6 +108,9 @@ public class Game {
 			}
 			if(!active) {return;}
 		}
+		System.out.println("P1 nodes(" + player1.getStatsVisitedNodes() + ") \t moves(" + player1.getStatsMovesNum() + ") \t ratio(" + (player1.getStatsVisitedNodes()/player1.getStatsMovesNum()) + ")");
+		System.out.println("P2 nodes(" + player2.getStatsVisitedNodes() + ") \t moves(" + player2.getStatsMovesNum() + ") \t ratio(" + (player2.getStatsVisitedNodes()/player2.getStatsMovesNum()) + ")");
+		
 		endGame();
 		System.out.println("And the winner is... PLAYER" + winner + "!");
 		JOptionPane.showMessageDialog(null,"Gracz "+Integer.toString(winner)+" wygrał!!!");

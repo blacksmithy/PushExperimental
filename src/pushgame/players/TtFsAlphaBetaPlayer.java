@@ -49,12 +49,17 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 		short alpha = Short.MIN_VALUE + 2;
 		short beta = Short.MAX_VALUE - 1;
 		
+		++statsMovesNum;
+		
 		/* ***************** Generating possible moves ***************** */
 		List<Movement> moves = board.getPossibleMoves(id);
 		
 		if ((id == 1 && board.getPlayer1BoardValue() == board.getPlayer1Initial()) || firstMoves != 0) {
 			if (firstMoves == 0) {
 				firstMoves = firstMovesNum - 1;
+				
+				statsVisitedNodes = 0;
+				statsMovesNum = 1;
 			}
 			else {
 				--firstMoves;
@@ -69,6 +74,9 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 		else if ((id == 2 && board.getPlayer2BoardValue() == board.getPlayer2Initial()) || firstMoves != 0) {
 			if (firstMoves == 0) {
 				firstMoves = firstMovesNum - 1;
+				
+				statsVisitedNodes = 0;
+				statsMovesNum = 1;
 			}
 			else {
 				--firstMoves;
@@ -144,6 +152,8 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 			}
 
 		}
+		
+		System.out.println("TT:" + tt.getSize());
 
 		return decision;
 	}
@@ -151,6 +161,11 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 	@Override
 	public void onThreadEnd(byte threadId, short value) {
 		threadReturn[threadId] = value;		
+	}
+	
+	@Override
+	public void onThreadEndCountNodes(long nodes) {
+		this.statsVisitedNodes += nodes;		
 	}
 
 }
@@ -166,6 +181,8 @@ class TtFsAlphaBetaThread extends Thread {
 	private short beta;
 	private byte player;
 	
+	private long nodesVisited;
+	
 	public TtFsAlphaBetaThread(byte threadId, Oracle oracle, Board board,
 			AlphaBetaThreadEndEvent event, TranspositionTable tt, short depth, short alpha, short beta,
 			byte player) {
@@ -179,9 +196,13 @@ class TtFsAlphaBetaThread extends Thread {
 		this.alpha = alpha;
 		this.beta = beta;
 		this.player = player;
+		
+		this.nodesVisited = 0;
 	}
 	
 	private short alphaBeta(Board inputBoard, short depth, short alpha, short beta, byte player) {
+		
+		++nodesVisited;
 		
 		if ((depth == 0) || inputBoard.getWinner() != 0) {
 			return this.oracle.getProphecy(this.board, inputBoard, null, player);
@@ -234,6 +255,7 @@ class TtFsAlphaBetaThread extends Thread {
 	public void run() {
 		short value = (short) -alphaBeta(board, depth, alpha, beta, player);
 		event.onThreadEnd(threadId, value);
+		event.onThreadEndCountNodes(this.nodesVisited);
 	}
 	
 }
