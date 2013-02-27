@@ -6,10 +6,10 @@ import pushgame.logic.Movement;
 public class SymmetricWeightedOracle extends Oracle {
 
 	private static final short[] FIELD_WEIGHT_PLAYER1 = new short[] {
-		0, 0, 1, 3, 5, 7, 11, 13
+		0, 0, 38, 60, 76, 88, 110, 111
 	};
 	private static final short[] FIELD_WEIGHT_PLAYER2 = new short[] {
-		13, 11, 7, 5, 3, 1, 0, 0
+		111, 110, 88, 76, 60, 38, 0, 0
 	};
 	
 	public SymmetricWeightedOracle() {}

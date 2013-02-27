@@ -13,8 +13,7 @@ public class PlayerFactory
 	static final public String RANDOM_AI="AI losowy";
 	static final public String FS_ALPHA_BETA = "AI alfa-beta FS";
 	static final public String FS_ALPHA_BETA_TT = "AI alfa-beta FS TT";
-	static final public String BLS_TEST = "Algo BLS";
-	static final public String ELF_TEST = "Algo ELF";
+	static final public String WEIGHTED_AB = "test wieghted";
 	static final public String C_STAR = "C* + TT";
 	static final public String MTD = "MTD(f) + TT";
 	
@@ -39,13 +38,14 @@ public class PlayerFactory
 		cb.addItem(FS_ALPHA_BETA_TT);
 		cb.addItem(C_STAR);
 		cb.addItem(MTD);
+		cb.addItem(WEIGHTED_AB);
 //		cb.addItem(ELF_TEST);
 //		cb.addItem(BLS_TEST);
 	}
 	
 	static public void loadDepths(int aiID,String algo,JComboBox<Integer> cb)
 	{
-		if(algo==ALPHA_BETA_AI || algo == FS_ALPHA_BETA || algo == FS_ALPHA_BETA_TT || algo == C_STAR || algo == MTD)
+		if(algo==ALPHA_BETA_AI || algo == FS_ALPHA_BETA || algo == FS_ALPHA_BETA_TT || algo == C_STAR || algo == MTD || algo == WEIGHTED_AB)
 		{
 			cb.removeAllItems();
 			cb.addItem(1);
@@ -101,20 +101,17 @@ public class PlayerFactory
 	static public Player getPlayer(byte id)
 	{
 		String ai="";
-		Integer md=0;
 		int delay=0;
 		GameConfig config = GameConfig.getInstance();
 		if(id==1)
 		{
 			ai=algoAI1;
-			md=depthAI1;
 			config.setAi1Depth(Short.valueOf(depthAI1.toString()));
 			delay=delay1;
 		}
 		else if(id==2)
 		{
 			ai=algoAI2;
-			md=depthAI2;
 			config.setAi2Depth(Short.valueOf(depthAI2.toString()));
 			delay=delay2;
 		}
@@ -152,7 +149,10 @@ public class PlayerFactory
 		{
 			result = new MtdPlayer(id, delay);
 		}
-		md++;
+		else if(ai==WEIGHTED_AB)
+		{
+			result = new TestAlphaBetaPlayer(id, delay);
+		}
 		return result;
 	}
 }
