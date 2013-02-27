@@ -23,6 +23,9 @@ public class PlayerFactory
 	static public Integer depthAI1=4;
 	static public String algoAI2=HUMAN_PLAYER;
 	static public Integer depthAI2=6;
+
+	static public Integer delay1=250;
+	static public Integer delay2=250;
 	
 	
 	static public void addAlgos(JComboBox<String> cb)
@@ -95,22 +98,25 @@ public class PlayerFactory
 		}
 	}
 	
-	static public Player getPlayer(byte id, int delay)
+	static public Player getPlayer(byte id)
 	{
 		String ai="";
 		Integer md=0;
+		int delay=0;
 		GameConfig config = GameConfig.getInstance();
 		if(id==1)
 		{
 			ai=algoAI1;
 			md=depthAI1;
 			config.setAi1Depth(Short.valueOf(depthAI1.toString()));
+			delay=delay1;
 		}
 		else if(id==2)
 		{
 			ai=algoAI2;
 			md=depthAI2;
 			config.setAi2Depth(Short.valueOf(depthAI2.toString()));
+			delay=delay2;
 		}
 		
 		Player result=null;

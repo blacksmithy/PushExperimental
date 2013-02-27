@@ -88,8 +88,6 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 		setBackground(Color.DARK_GRAY);
 		setResizable(false);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setEnabled(true);
-		setVisible(true);
 		addWindowListener(this);
 		getContentPane().setLayout(null);
 		start = new Point(20, 30);
@@ -150,6 +148,9 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 		lblGracz_2.setVisible(true);
 		getContentPane().add(lblGracz_2);
 		//playTheGame();
+
+		setEnabled(true);
+		setVisible(true);
 	}
 	
 	public GameWindow(InteractiveBoardPanel panel)
@@ -160,8 +161,6 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 		setBackground(Color.GRAY);
 		setResizable(false);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setEnabled(true);
-		setVisible(true);
 		addWindowListener(this);
 		getContentPane().setLayout(null);
 		start = new Point(20, 50);
@@ -216,6 +215,9 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 		lblGracz_2.setVisible(true);
 		getContentPane().add(lblGracz_2);
 		//playTheGame();
+
+		setEnabled(true);
+		setVisible(true);
 	}
 	
 	public void playTheGame() {
@@ -228,8 +230,8 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 		}
 		else
 		{
-			player1 = PlayerFactory.getPlayer((byte) 1, GameConfig.delay);
-			player2 = PlayerFactory.getPlayer((byte) 2, GameConfig.delay);
+			player1 = PlayerFactory.getPlayer((byte) 1);
+			player2 = PlayerFactory.getPlayer((byte) 2);
 		}
 		game = new Game(player1, player2, this);
 		if(editMode) {game.hold();}

@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import javax.swing.JPanel;
 
 import pushgame.logic.Board;
+import pushgame.util.GameConfig;
 import pushgame.util.GlobalSettings;
 
 /**
@@ -118,9 +119,9 @@ public class BoardPanel extends JPanel {
 			for (byte j = 0; j < GlobalSettings.BOARD_SIZE; ++j) {
 				if ((val = board.get(i, j)) != 0) {
 					if (val == GlobalSettings.PLAYER_1_ID)
-						drawPawn(g, Color.blue, i, j);
+						drawPawn(g, GameConfig.player1Color, i, j);
 					else
-						drawPawn(g, Color.red, i, j);
+						drawPawn(g, GameConfig.player2Color, i, j);
 				}
 			}
 		}

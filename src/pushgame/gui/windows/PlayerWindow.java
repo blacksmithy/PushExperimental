@@ -15,6 +15,7 @@ import javax.swing.event.ChangeListener;
 
 import pushgame.players.PlayerFactory;
 import pushgame.util.GameConfig;
+import javax.swing.JLabel;
 
 
 @SuppressWarnings("serial")
@@ -32,16 +33,17 @@ public class PlayerWindow extends JFrame implements ChangeListener,
 
 	JComboBox<Integer> md1 = new JComboBox<Integer>();
 	JComboBox<Integer> md2 = new JComboBox<Integer>();
+	DelaySelection cbDelay1 = new DelaySelection();
+	DelaySelection cbDelay2 = new DelaySelection();
+	private final JLabel lblOpnienieDlaGracza = new JLabel("Opóżnienie dla gracza drugiego");
 
 	public PlayerWindow()
 	{
 		super("Pionek");
-		setBounds(100, 100, 620, 380);
+		setBounds(100, 100, 620, 396);
 		setBackground(Color.GRAY);
 		setResizable(false);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setEnabled(true);
-		setVisible(true);
 
 		rb1.setBounds(10, 5, 112, 30);
 		rb1.setSelected(true);
@@ -51,7 +53,7 @@ public class PlayerWindow extends JFrame implements ChangeListener,
 		getContentPane().add(rb1);
 		getContentPane().add(rb2);
 
-		cc1.setBounds(0, 40, 620, 400);
+		cc1.setBounds(0, 65, 620, 400);
 		getContentPane().add(cc1);
 		getContentPane().setLayout(null);
 		rb1.addActionListener(this);
@@ -96,6 +98,27 @@ public class PlayerWindow extends JFrame implements ChangeListener,
 		md2.setVisible(md2.getItemCount()>0);
 		md2.addActionListener(this);
 		getContentPane().add(md2);
+		
+		cbDelay1.setBounds(215, 34, 58, 20);
+		getContentPane().add(cbDelay1);
+		
+		JLabel lblNewLabel = new JLabel("Opóżnienie dla gracza pierwszego");
+		lblNewLabel.setBounds(10, 37, 195, 14);
+		getContentPane().add(lblNewLabel);
+		cbDelay2.setBounds(508, 34, 58, 20);
+		
+		getContentPane().add(cbDelay2);
+		lblOpnienieDlaGracza.setBounds(325, 37, 180, 14);
+		
+		getContentPane().add(lblOpnienieDlaGracza);
+
+		cbDelay1.selectItem(PlayerFactory.delay1);
+		cbDelay1.addActionListener(this);
+		cbDelay2.selectItem(PlayerFactory.delay2);
+		cbDelay2.addActionListener(this);
+		
+		setEnabled(true);
+		setVisible(true);
 
 	}
 
@@ -145,5 +168,39 @@ public class PlayerWindow extends JFrame implements ChangeListener,
 		{
 			PlayerFactory.setDepth(2, md2);
 		}
+		if (src == cbDelay1)
+		{
+			PlayerFactory.delay1=cbDelay1.getDelay();
+		}
+		if (src == cbDelay2)
+		{
+			PlayerFactory.delay2=cbDelay2.getDelay();
+		}
+	}
+}
+
+class DelaySelection extends JComboBox<Double>
+{
+	private static final long serialVersionUID = 6580634851348870110L;
+
+	public DelaySelection()
+	{
+		super();
+		addItem(0.0);
+		addItem(0.10);
+		addItem(0.25);
+		addItem(0.5);
+		addItem(0.75);
+		addItem(1.0);
+	}
+	
+	public int getDelay()
+	{
+		return (int) ((double)(getSelectedItem())*1000);
+	}
+	
+	public void selectItem(int delay)
+	{
+		setSelectedItem(((double)(delay)/1000));
 	}
 }
