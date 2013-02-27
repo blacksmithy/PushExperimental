@@ -100,8 +100,8 @@ public class Counter extends Thread
 	public void reset()
 	{
 		time[0] = 1;
-		time[1] = 1;
-		time[2] = 1;
+		time[1] = 0;
+		time[2] = 0;
 	}
 	
 	/**

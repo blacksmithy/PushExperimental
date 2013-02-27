@@ -1,6 +1,5 @@
 package pushgame.players;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import pushgame.gui.boardpanel.FieldListener;

@@ -21,7 +21,7 @@ public class MainMenu extends JFrame implements ActionListener
 	JButton loadGame = new JButton("Załaduj grę");
 	JButton editBoard = new JButton("Ustaw planszę");
 	JButton players = new JButton("Wybór graczy");
-	JButton settings = new JButton("Ustawienia");
+	JButton help = new JButton("Pomoc");
 	JButton exit = new JButton("Wyjdź");
 	JLabel title = new JLabel("PUSH");
 
@@ -56,10 +56,10 @@ public class MainMenu extends JFrame implements ActionListener
 		players.addActionListener(this);
 		getContentPane().add(players);
 		
-		settings.setLocation(10, 153);
-		settings.setSize(120, 30);
-		settings.addActionListener(this);
-		getContentPane().add(settings);
+		help.setLocation(10, 153);
+		help.setSize(120, 30);
+		help.addActionListener(this);
+		getContentPane().add(help);
 		
 		exit.setLocation(140, 153);
 		exit.setSize(120, 30);
@@ -101,9 +101,9 @@ public class MainMenu extends JFrame implements ActionListener
 				}
 	        }
 		}
-		else if (src == settings)
+		else if (src == help)
 		{
-			new SettingsWindow();
+			new HelpWindow();
 		}
 		else if (src == exit)
 		{
