@@ -24,6 +24,8 @@ public class GreedyPlayer extends Player {
 		Movement decision = null;
 		List<Movement> moves = board.getPossibleMoves(id);
 		
+		System.out.println("|<0, i>| -> " + moves.size());
+		
 		List<Movement> lockPreventionMoves = null;
 		Oracle oracle = new DistancesOracle();
 		decision = moves.get(0);

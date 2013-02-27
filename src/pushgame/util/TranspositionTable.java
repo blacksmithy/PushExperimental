@@ -1,19 +1,17 @@
 package pushgame.util;
 
 import java.util.HashMap;
-import java.util.HashSet;
+//import java.util.HashSet;
 
 public class TranspositionTable {
 
 	private HashMap<Long, Transposition> map;
-	private HashSet<Long> purgatory;
-	private int limit = 5000;
+	//private HashSet<Long> purgatory;
+	//private int limit = 5000;
 	
 	public TranspositionTable() {
 		map = new HashMap<Long, Transposition>(1000000);
 		//purgatory = new HashSet<Long>();
-		map = new HashMap<Long, Transposition>(20000);
-		purgatory = new HashSet<Long>();
 	}
 	
 	public Transposition get(long hash) {		
@@ -21,10 +19,8 @@ public class TranspositionTable {
 	}
 	
 	public void put(Transposition transposition, long hash) {
-
 			if (map.containsKey(hash)) {
 				map.remove(hash);
-				
 			}
 			map.put(hash, transposition);
 

@@ -16,7 +16,8 @@ import pushgame.util.TranspositionTable;
 public class MtdPlayer extends Player {
 
 	private Oracle oracle;
-	private TranspositionTable tt;
+	private TranspositionTable tt1;
+	private TranspositionTable tt2;
 	private Board board;
 	
 	private int firstMoves = 0;
@@ -69,10 +70,18 @@ public class MtdPlayer extends Player {
 
 		List<Movement> moves;
 		
-		Transposition t = tt.get(inputBoard.getHash());
-		if (t != null) { // jeśli znaleziono coś w tablicy transpozycji
-			if (t.getDepth() >= depth) { // i wynik może mieć znaczenie na tym
-											// poziomie
+		Transposition t = null;
+		short prevAlpha = alpha;
+		
+		if (player == 1) {
+			t = tt1.get(inputBoard.getHash());
+		}
+		else {
+			t = tt2.get(inputBoard.getHash());
+		}
+		
+		if (t != null) {
+			if (t.getDepth() >= depth) {
 				if (t.getType() == Transposition.VALUE_LOWER)
 					alpha = (short) Math.max(alpha, t.getValue());
 				else if (t.getType() == Transposition.VALUE_UPPER)
@@ -82,18 +91,16 @@ public class MtdPlayer extends Player {
 					beta = t.getValue();
 				}
 			}
-			if (alpha >= beta) // odcięcie
-				return t.getValue();
-			
-			moves = inputBoard.getPossibleMoves(player);
-			
+			if (alpha >= beta) // cutoff
+				return t.getValue();			
+		}
+		moves = inputBoard.getPossibleMoves(player);
+		
+		if (t != null) {
 			int idx = moves.indexOf(t.getNextBest());
 			if (idx != -1 && idx != 0) {
 				Collections.swap(moves, idx, 0);
 			}
-		}
-		else {
-			moves = inputBoard.getPossibleMoves(player);
 		}
 
 		short best = Short.MIN_VALUE;
@@ -120,8 +127,12 @@ public class MtdPlayer extends Player {
 		}
 
 		if (bestFound) {
-			tt.put(new Transposition(best, depth, alpha, beta, nextBest),
-					inputBoard.getHash());
+			if (player == 1) {
+				tt1.put(new Transposition(best, depth, prevAlpha, beta, nextBest), inputBoard.getHash());
+			}
+			else {
+				tt2.put(new Transposition(best, depth, prevAlpha, beta, nextBest), inputBoard.getHash());
+			}
 		}
 		return best;
 	}
@@ -134,20 +145,41 @@ public class MtdPlayer extends Player {
 		else
 			depth = GameConfig.getInstance().getAi2Depth();
 
-		tt = new TranspositionTable();
+		tt1 = new TranspositionTable();
+		tt2 = new TranspositionTable();
 		this.board = board;
 
 		Movement decision = null;
 		short decisionValue = Short.MIN_VALUE;
 
 		/* ***************** Generating possible moves ***************** */
+
 		List<Movement> moves = board.getPossibleMoves(id);
-		
-		if ((id == 1 && board.getPlayer1BoardValue() == board.getPlayer1Initial()) || firstMoves != 0) {
+
+		if ((id == 1 && board.getPlayer1BoardValue() == board
+				.getPlayer1Initial()) || firstMoves != 0) {
 			if (firstMoves == 0) {
 				firstMoves = firstMovesNum - 1;
+
+				statsVisitedNodes = 0;
+				statsMovesNum = 1;
+			} else {
+				--firstMoves;
 			}
-			else {
+			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
+			for (Movement m : moves) {
+				if (!(m.getChain() < 1 || m.getDistance() != 3))
+					moves2.add(m);
+			}
+			moves = moves2;
+		} else if ((id == 2 && board.getPlayer2BoardValue() == board
+				.getPlayer2Initial()) || firstMoves != 0) {
+			if (firstMoves == 0) {
+				firstMoves = firstMovesNum - 1;
+
+				statsVisitedNodes = 0;
+				statsMovesNum = 1;
+			} else {
 				--firstMoves;
 			}
 			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
@@ -157,24 +189,40 @@ public class MtdPlayer extends Player {
 			}
 			moves = moves2;
 		}
-		else if ((id == 2 && board.getPlayer2BoardValue() == board.getPlayer2Initial()) || firstMoves != 0) {
-			if (firstMoves == 0) {
-				firstMoves = firstMovesNum - 1;
-			}
-			else {
-				--firstMoves;
-			}
-			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
+
+		byte enemy = (byte) (3 - id);
+
+		if (!board.hasForwardMoves(id)) { // LOCK PREVENTION
+			boolean nextMoveForward = false;
+			List<Movement> forwardMoves = new ArrayList<Movement>();
 			for (Movement m : moves) {
-				if (!(m.getChain() < 1 || m.getDistance() != 3))
-					moves2.add(m);
+				if ((m.getAngle() == 6 || m.getAngle() == 2)
+						&& board.getBoardCopyAfterMove(m).hasForwardMoves(id)) {
+					nextMoveForward = true;
+					forwardMoves.add(m);
+				}
 			}
-			moves = moves2;
+			if (!forwardMoves.isEmpty()) {
+				moves = forwardMoves;
+			}
+
+			if (!nextMoveForward) { // UNLOCK ENEMY
+				List<Movement> moves3 = new ArrayList<Movement>();
+				for (Movement m : moves) {
+					if (board.getBoardCopyAfterMove(m).hasForwardMoves(enemy)) {
+						moves3.add(m);
+					}
+				}
+				if (!moves3.isEmpty()) {
+					moves = moves3;
+				}
+			}
+		} else {
+			sortEnable = GameConfig.getInstance().isSortEnabled();
+			if (sortEnable)
+				Collections.sort(moves, new MovementComparator());
 		}
-		
-		sortEnable = GameConfig.getInstance().isSortEnabled();
-		if (sortEnable)
-			Collections.sort(moves, new MovementComparator());
+
 		/* ************************************************************* */
 
 		short temp = Short.MIN_VALUE;

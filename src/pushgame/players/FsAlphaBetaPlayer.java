@@ -48,16 +48,33 @@ public class FsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent
 		++statsMovesNum;
 		
 		/* ***************** Generating possible moves ***************** */
+
 		List<Movement> moves = board.getPossibleMoves(id);
-		
-		if ((id == 1 && board.getPlayer1BoardValue() == board.getPlayer1Initial()) || firstMoves != 0) {
+
+		if ((id == 1 && board.getPlayer1BoardValue() == board
+				.getPlayer1Initial()) || firstMoves != 0) {
 			if (firstMoves == 0) {
 				firstMoves = firstMovesNum - 1;
-				
+
 				statsVisitedNodes = 0;
 				statsMovesNum = 1;
+			} else {
+				--firstMoves;
 			}
-			else {
+			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
+			for (Movement m : moves) {
+				if (!(m.getChain() < 1 || m.getDistance() != 3))
+					moves2.add(m);
+			}
+			moves = moves2;
+		} else if ((id == 2 && board.getPlayer2BoardValue() == board
+				.getPlayer2Initial()) || firstMoves != 0) {
+			if (firstMoves == 0) {
+				firstMoves = firstMovesNum - 1;
+
+				statsVisitedNodes = 0;
+				statsMovesNum = 1;
+			} else {
 				--firstMoves;
 			}
 			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
@@ -67,27 +84,40 @@ public class FsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent
 			}
 			moves = moves2;
 		}
-		else if ((id == 2 && board.getPlayer2BoardValue() == board.getPlayer2Initial()) || firstMoves != 0) {
-			if (firstMoves == 0) {
-				firstMoves = firstMovesNum - 1;
-				
-				statsVisitedNodes = 0;
-				statsMovesNum = 1;
-			}
-			else {
-				--firstMoves;
-			}
-			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
+
+		byte enemy = (byte) (3 - id);
+
+		if (!board.hasForwardMoves(id)) { // LOCK PREVENTION
+			boolean nextMoveForward = false;
+			List<Movement> forwardMoves = new ArrayList<Movement>();
 			for (Movement m : moves) {
-				if (!(m.getChain() < 1 || m.getDistance() != 3))
-					moves2.add(m);
+				if ((m.getAngle() == 6 || m.getAngle() == 2)
+						&& board.getBoardCopyAfterMove(m).hasForwardMoves(id)) {
+					nextMoveForward = true;
+					forwardMoves.add(m);
+				}
 			}
-			moves = moves2;
+			if (!forwardMoves.isEmpty()) {
+				moves = forwardMoves;
+			}
+
+			if (!nextMoveForward) { // UNLOCK ENEMY
+				List<Movement> moves3 = new ArrayList<Movement>();
+				for (Movement m : moves) {
+					if (board.getBoardCopyAfterMove(m).hasForwardMoves(enemy)) {
+						moves3.add(m);
+					}
+				}
+				if (!moves3.isEmpty()) {
+					moves = moves3;
+				}
+			}
+		} else {
+			sortEnable = GameConfig.getInstance().isSortEnabled();
+			if (sortEnable)
+				Collections.sort(moves, new MovementComparator());
 		}
-		
-		sortEnable = GameConfig.getInstance().isSortEnabled();
-		if (sortEnable)
-			Collections.sort(moves, new MovementComparator());
+
 		/* ************************************************************* */
 		
 		int iterStep = 2;

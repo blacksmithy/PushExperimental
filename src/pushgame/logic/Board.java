@@ -1204,6 +1204,167 @@ public class Board implements Serializable {
 		}
 		return moves;
 	}
+	
+	
+	public boolean hasForwardMoves(byte player) {
+		List<Movement> moves = new ArrayList<Movement>();
+		byte temp = 0;
+		byte chain = 0;
+		byte empty = 0;
+		long playerBoard = 0;
+		long enemyBoard = 0;
+		if (player == player1) {
+			playerBoard = player1Board;
+			enemyBoard = player2Board;
+		} else {
+			playerBoard = player2Board;
+			enemyBoard = player1Board;
+		}
+		// 7 | 0 | 1
+		// 6 | X | 2
+		// 5 | 4 | 3
+
+		for (byte i = 0; i < 64; ++i) {
+			if ((playerBoard & fieldsMasks[i]) != 0) {
+
+				if (player == player1) {
+					/* ******************* angle == 3 ******************* */
+
+					temp = (byte) ((byte) i + 9);
+					if (temp < 64) {
+						if ((playerBoard & fieldsMasks[temp]) != 0) {
+							chain = getChainLength(i, (byte) 3);
+							if (chain != 0) {
+								empty = countNextEmptyFields(
+										(byte) (i + (9 * chain)), (byte) 3);
+								if (1 <= empty) {
+									return true;
+								}
+							}
+						} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+							empty = countNextEmptyFields(i, (byte) 3);
+							if (1 <= empty) {
+								return true;
+							}
+						}
+					}
+
+					/* ************************************************** */
+
+					/* ******************* angle == 4 ******************* */
+
+					temp = (byte) ((byte) i + 8);
+					if (temp < 64) {
+						if ((playerBoard & fieldsMasks[temp]) != 0) {
+							chain = getChainLength(i, (byte) 4);
+							if (chain != 0) {
+								empty = countNextEmptyFields(
+										(byte) (i + (8 * chain)), (byte) 4);
+								if (1 <= empty) {
+									return true;
+								}
+							}
+						} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+							empty = countNextEmptyFields(i, (byte) 4);
+							if (1 <= empty) {
+								return true;
+							}
+						}
+
+						/* ************************************************** */
+
+						/*
+						 * ******************* angle == 5 *******************
+						 */
+						temp = (byte) ((byte) i + 7);
+						if (temp < 64) {
+							if ((playerBoard & fieldsMasks[temp]) != 0) {
+								chain = getChainLength(i, (byte) 5);
+								if (chain != 0) {
+									empty = countNextEmptyFields(
+											(byte) (i + (7 * chain)), (byte) 5);
+									if (1 <= empty) {
+										return true;
+									}
+								}
+							} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+								empty = countNextEmptyFields(i, (byte) 5);
+								if (1 <= empty) {
+									return true;
+								}
+							}
+						}
+
+						/* ************************************************** */
+					}
+				} else if (player == player2) {
+					/* ******************* angle == 0 ******************* */
+					temp = (byte) ((byte) i - 8);
+					if (temp >= 0) {
+						if ((playerBoard & fieldsMasks[temp]) != 0) {
+							chain = getChainLength(i, (byte) 0);
+							if (chain != 0) {
+								empty = countNextEmptyFields(
+										(byte) (i - (chain * 8)), (byte) 0);
+								if (1 <= empty) {
+									return true;
+								}
+							}
+						} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+							empty = countNextEmptyFields(i, (byte) 0);
+							if (1 <= empty) {
+								return true;
+							}
+						}
+					}
+					/* ************************************************** */
+
+					/* ******************* angle == 1 ******************* */
+					temp = (byte) ((byte) i - 7);
+					if (temp >= 0) {
+						if ((playerBoard & fieldsMasks[temp]) != 0) {
+							chain = getChainLength(i, (byte) 1);
+							if (chain != 0) {
+								empty = countNextEmptyFields(
+										(byte) (i - (chain * 7)), (byte) 1);
+								if (1 <= empty) {
+									return true;
+								}
+							}
+						} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+							empty = countNextEmptyFields(i, (byte) 1);
+							if (1 <= empty) {
+								return true;
+							}
+						}
+					}
+					/* ************************************************** */
+
+					/* ******************* angle == 7 ******************* */
+					temp = (byte) ((byte) i - 9);
+					if (temp >= 0) {
+						if ((playerBoard & fieldsMasks[temp]) != 0) {
+							chain = getChainLength(i, (byte) 7);
+							if (chain != 0) {
+								empty = countNextEmptyFields(
+										(byte) (i - (chain * 9)), (byte) 7);
+								if (1 <= empty) {
+									return true;
+								}
+							}
+						} else if ((enemyBoard & fieldsMasks[temp]) == 0) {
+							empty = countNextEmptyFields(i, (byte) 7);
+							if (1 <= empty) {
+								return true;
+							}
+						}
+					}
+					/* ************************************************** */
+				}
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Makes move on board.

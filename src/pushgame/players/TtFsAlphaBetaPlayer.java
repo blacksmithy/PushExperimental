@@ -42,7 +42,8 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 		else
 			depth = GameConfig.getInstance().getAi2Depth();
 		
-		TranspositionTable tt = new TranspositionTable();
+		TranspositionTable tt1 = new TranspositionTable();
+		TranspositionTable tt2 = new TranspositionTable();
 		
 		Movement decision = null;
 		short decisionValue = Short.MIN_VALUE;
@@ -52,16 +53,33 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 		++statsMovesNum;
 		
 		/* ***************** Generating possible moves ***************** */
+
 		List<Movement> moves = board.getPossibleMoves(id);
-		
-		if ((id == 1 && board.getPlayer1BoardValue() == board.getPlayer1Initial()) || firstMoves != 0) {
+
+		if ((id == 1 && board.getPlayer1BoardValue() == board
+				.getPlayer1Initial()) || firstMoves != 0) {
 			if (firstMoves == 0) {
 				firstMoves = firstMovesNum - 1;
-				
+
 				statsVisitedNodes = 0;
 				statsMovesNum = 1;
+			} else {
+				--firstMoves;
 			}
-			else {
+			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
+			for (Movement m : moves) {
+				if (!(m.getChain() < 1 || m.getDistance() != 3))
+					moves2.add(m);
+			}
+			moves = moves2;
+		} else if ((id == 2 && board.getPlayer2BoardValue() == board
+				.getPlayer2Initial()) || firstMoves != 0) {
+			if (firstMoves == 0) {
+				firstMoves = firstMovesNum - 1;
+
+				statsVisitedNodes = 0;
+				statsMovesNum = 1;
+			} else {
 				--firstMoves;
 			}
 			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
@@ -71,27 +89,40 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 			}
 			moves = moves2;
 		}
-		else if ((id == 2 && board.getPlayer2BoardValue() == board.getPlayer2Initial()) || firstMoves != 0) {
-			if (firstMoves == 0) {
-				firstMoves = firstMovesNum - 1;
-				
-				statsVisitedNodes = 0;
-				statsMovesNum = 1;
-			}
-			else {
-				--firstMoves;
-			}
-			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
+
+		byte enemy = (byte) (3 - id);
+
+		if (!board.hasForwardMoves(id)) { // LOCK PREVENTION
+			boolean nextMoveForward = false;
+			List<Movement> forwardMoves = new ArrayList<Movement>();
 			for (Movement m : moves) {
-				if (!(m.getChain() < 1 || m.getDistance() != 3))
-					moves2.add(m);
+				if ((m.getAngle() == 6 || m.getAngle() == 2)
+						&& board.getBoardCopyAfterMove(m).hasForwardMoves(id)) {
+					nextMoveForward = true;
+					forwardMoves.add(m);
+				}
 			}
-			moves = moves2;
+			if (!forwardMoves.isEmpty()) {
+				moves = forwardMoves;
+			}
+
+			if (!nextMoveForward) { // UNLOCK ENEMY
+				List<Movement> moves3 = new ArrayList<Movement>();
+				for (Movement m : moves) {
+					if (board.getBoardCopyAfterMove(m).hasForwardMoves(enemy)) {
+						moves3.add(m);
+					}
+				}
+				if (!moves3.isEmpty()) {
+					moves = moves3;
+				}
+			}
+		} else {
+			sortEnable = GameConfig.getInstance().isSortEnabled();
+			if (sortEnable)
+				Collections.sort(moves, new MovementComparator());
 		}
-		
-		sortEnable = GameConfig.getInstance().isSortEnabled();
-		if (sortEnable)
-			Collections.sort(moves, new MovementComparator());
+
 		/* ************************************************************* */
 		
 		int iterStep = 2;
@@ -102,10 +133,10 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 		for (int i = 0; i < moves.size(); i += iterStep) {
 			System.out.println("->" + i);
 			
-			threads[0] = new TtFsAlphaBetaThread((byte) 0, oracle, board.getBoardCopyAfterMove(moves.get(i)), this, tt, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
+			threads[0] = new TtFsAlphaBetaThread((byte) 0, oracle, board.getBoardCopyAfterMove(moves.get(i)), this, tt1, tt2, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
 			threads[0].run();
 			if (! forceOneThread && (i + 1 < moves.size())) {
-				threads[1] = new TtFsAlphaBetaThread((byte) 1, oracle2, board.getBoardCopyAfterMove(moves.get(i+1)), this, tt, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
+				threads[1] = new TtFsAlphaBetaThread((byte) 1, oracle2, board.getBoardCopyAfterMove(moves.get(i+1)), this, tt1, tt2, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
 				threads[1].run();
 			}
 			
@@ -120,7 +151,6 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 			
 			if (threadReturn[0] > alpha) {
 				alpha = threadReturn[0];
-					//System.out.println("i: " + i + " NOWA ALFA: " + alpha);
 			}
 			if (alpha >= beta) {
 			//	System.out.println("ODCIĘCIE!!!!!!!!!");
@@ -134,10 +164,8 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 			if (! forceOneThread && (i + 1 < moves.size())) {
 				if (threadReturn[1] > alpha) {
 					alpha = threadReturn[1];
-						//System.out.println("i: " + i + " NOWA ALFA: " + alpha);
 				}
 				if (alpha >= beta) {
-					//System.out.println("ODCIĘCIE!!!!!!!!!");
 					break;
 				}
 				if (threadReturn[1] > decisionValue) {
@@ -153,7 +181,7 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 
 		}
 		
-		System.out.println("TT:" + tt.getSize());
+		System.out.println("TT:" + tt1.getSize() + tt2.getSize());
 
 		return decision;
 	}
@@ -175,7 +203,8 @@ class TtFsAlphaBetaThread extends Thread {
 	private Oracle oracle;
 	private Board board;
 	private AlphaBetaThreadEndEvent event;
-	private TranspositionTable tt;
+	private TranspositionTable tt1;
+	private TranspositionTable tt2;
 	private short depth;
 	private short alpha;
 	private short beta;
@@ -184,14 +213,15 @@ class TtFsAlphaBetaThread extends Thread {
 	private long nodesVisited;
 	
 	public TtFsAlphaBetaThread(byte threadId, Oracle oracle, Board board,
-			AlphaBetaThreadEndEvent event, TranspositionTable tt, short depth, short alpha, short beta,
+			AlphaBetaThreadEndEvent event, TranspositionTable tt1, TranspositionTable tt2, short depth, short alpha, short beta,
 			byte player) {
 		super();
 		this.threadId = threadId;
 		this.oracle = oracle;
 		this.board = board;
 		this.event = event;
-		this.tt = tt;
+		this.tt1 = tt1;
+		this.tt2 = tt2;
 		this.depth = depth;
 		this.alpha = alpha;
 		this.beta = beta;
@@ -208,13 +238,19 @@ class TtFsAlphaBetaThread extends Thread {
 			return this.oracle.getProphecy(this.board, inputBoard, null, player);
 		}
 		
-		List<Movement> moves; // = inputBoard.getPossibleMoves(player);
+		List<Movement> moves = null;
+		Transposition t = null;
+		short prevAlpha = alpha;
+
+		if (player == 1) {
+			t = tt1.get(inputBoard.getHash());
+		}
+		else {
+			t = tt2.get(inputBoard.getHash());
+		}
 		
-		Transposition t = tt.get(inputBoard.getHash());
-		if (t != null) { // jeśli znaleziono coś w tablicy transpozycji
-			//System.out.println("HIT!");
-			
-			if (t.getDepth() >= depth) { // i wynik może mieć znaczenie na tym poziomie
+		if (t != null) {
+			if (t.getDepth() >= depth) {
 				if (t.getType() == Transposition.VALUE_LOWER)
 					alpha = (short) Math.max(alpha, t.getValue());
 				else if (t.getType() == Transposition.VALUE_UPPER)
@@ -224,26 +260,21 @@ class TtFsAlphaBetaThread extends Thread {
 					beta = t.getValue();
 				}
 			}
-			if (alpha >= beta) // odcięcie
-				return t.getValue();
-			
-			moves = inputBoard.getPossibleMoves(player);
-			
+			if (alpha >= beta) // cutoff
+				return t.getValue();			
+		}
+		moves = inputBoard.getPossibleMoves(player);
+		
+		if (t != null) {
 			int idx = moves.indexOf(t.getNextBest());
 			if (idx != -1 && idx != 0) {
 				Collections.swap(moves, idx, 0);
 			}
-			//moves.add(t.getNextBest());
 		}
-		else {
-			moves = inputBoard.getPossibleMoves(player);
-		}
-		
+
 		short best = Short.MIN_VALUE;
 		boolean bestFound = false;
-		
 		Movement nextBest = null;
-		
 		short value = 0;
 		
 		for (Movement m : moves) {
@@ -261,9 +292,14 @@ class TtFsAlphaBetaThread extends Thread {
 		}
 		
 		if (bestFound) {
-			//System.out.println("HASH = " + inputBoard.getHash());
-			tt.put(new Transposition(best, depth, alpha, beta, nextBest), inputBoard.getHash());
-			//System.out.println("TT_SIZE = " + tt.getSize());
+			if (player == 1) {
+				//if (t == null || depth < t.getDepth() || (depth == t.getDepth() && best > t.getValue()))
+					tt1.put(new Transposition(best, depth, prevAlpha, beta, nextBest), inputBoard.getHash());
+			}
+			else {
+				//if (t == null || depth < t.getDepth() || (depth == t.getDepth() && best > t.getValue()))
+					tt2.put(new Transposition(best, depth, prevAlpha, beta, nextBest), inputBoard.getHash());
+			}
 		}
 		return best;
 	}

@@ -51,16 +51,33 @@ public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 		++statsMovesNum;
 		
 		/* ***************** Generating possible moves ***************** */
+
 		List<Movement> moves = board.getPossibleMoves(id);
-		
-		if ((id == 1 && board.getPlayer1BoardValue() == board.getPlayer1Initial()) || firstMoves != 0) {
+
+		if ((id == 1 && board.getPlayer1BoardValue() == board
+				.getPlayer1Initial()) || firstMoves != 0) {
 			if (firstMoves == 0) {
 				firstMoves = firstMovesNum - 1;
-				
+
 				statsVisitedNodes = 0;
 				statsMovesNum = 1;
+			} else {
+				--firstMoves;
 			}
-			else {
+			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
+			for (Movement m : moves) {
+				if (!(m.getChain() < 1 || m.getDistance() != 3))
+					moves2.add(m);
+			}
+			moves = moves2;
+		} else if ((id == 2 && board.getPlayer2BoardValue() == board
+				.getPlayer2Initial()) || firstMoves != 0) {
+			if (firstMoves == 0) {
+				firstMoves = firstMovesNum - 1;
+
+				statsVisitedNodes = 0;
+				statsMovesNum = 1;
+			} else {
 				--firstMoves;
 			}
 			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
@@ -70,27 +87,40 @@ public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 			}
 			moves = moves2;
 		}
-		else if ((id == 2 && board.getPlayer2BoardValue() == board.getPlayer2Initial()) || firstMoves != 0) {
-			if (firstMoves == 0) {
-				firstMoves = firstMovesNum - 1;
-				
-				statsVisitedNodes = 0;
-				statsMovesNum = 1;
-			}
-			else {
-				--firstMoves;
-			}
-			List<Movement> moves2 = new ArrayList<Movement>(moves.size());
+
+		byte enemy = (byte) (3 - id);
+
+		if (!board.hasForwardMoves(id)) { // LOCK PREVENTION
+			boolean nextMoveForward = false;
+			List<Movement> forwardMoves = new ArrayList<Movement>();
 			for (Movement m : moves) {
-				if (!(m.getChain() < 1 || m.getDistance() != 3))
-					moves2.add(m);
+				if ((m.getAngle() == 6 || m.getAngle() == 2)
+						&& board.getBoardCopyAfterMove(m).hasForwardMoves(id)) {
+					nextMoveForward = true;
+					forwardMoves.add(m);
+				}
 			}
-			moves = moves2;
+			if (!forwardMoves.isEmpty()) {
+				moves = forwardMoves;
+			}
+
+			if (!nextMoveForward) { // UNLOCK ENEMY
+				List<Movement> moves3 = new ArrayList<Movement>();
+				for (Movement m : moves) {
+					if (board.getBoardCopyAfterMove(m).hasForwardMoves(enemy)) {
+						moves3.add(m);
+					}
+				}
+				if (!moves3.isEmpty()) {
+					moves = moves3;
+				}
+			}
+		} else {
+			sortEnable = GameConfig.getInstance().isSortEnabled();
+			if (sortEnable)
+				Collections.sort(moves, new MovementComparator());
 		}
-		
-		sortEnable = GameConfig.getInstance().isSortEnabled();
-		if (sortEnable)
-			Collections.sort(moves, new MovementComparator());
+
 		/* ************************************************************* */
 		
 		int iterStep = 2;
@@ -101,10 +131,10 @@ public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 		for (int i = 0; i < moves.size(); i += iterStep) {
 			System.out.println("->" + i);
 			
-			threads[0] = new AlphaBetaThread((byte) 0, oracle, board.getBoardCopyAfterMove(moves.get(i)), this, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
+			threads[0] = new AlphaBetaThread((byte) 0, oracle, board.getBoardCopyAfterMove(moves.get(i)), moves.get(i), this, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
 			threads[0].run();
 			if (! forceOneThread && (i + 1 < moves.size())) {
-				threads[1] = new AlphaBetaThread((byte) 1, oracle2, board.getBoardCopyAfterMove(moves.get(i+1)), this, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
+				threads[1] = new AlphaBetaThread((byte) 1, oracle2, board.getBoardCopyAfterMove(moves.get(i+1)), moves.get(i+1), this, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
 				threads[1].run();
 			}
 			
@@ -119,10 +149,8 @@ public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 			
 			if (threadReturn[0] > alpha) {
 				alpha = threadReturn[0];
-					//System.out.println("i: " + i + " NOWA ALFA: " + alpha);
 			}
 			if (alpha >= beta) {
-			//	System.out.println("ODCIĘCIE!!!!!!!!!");
 				break;
 			}
 			if (threadReturn[0] > decisionValue)
@@ -133,10 +161,8 @@ public class AlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
 			if (! forceOneThread && (i + 1 < moves.size())) {
 				if (threadReturn[1] > alpha) {
 					alpha = threadReturn[1];
-						//System.out.println("i: " + i + " NOWA ALFA: " + alpha);
 				}
 				if (alpha >= beta) {
-					//System.out.println("ODCIĘCIE!!!!!!!!!");
 					break;
 				}
 				if (threadReturn[1] > decisionValue) {
@@ -171,6 +197,7 @@ class AlphaBetaThread extends Thread {
 	private byte threadId;
 	private Oracle oracle;
 	private Board board;
+	private Movement lastMove;
 	private AlphaBetaThreadEndEvent event;
 	private short depth;
 	private short alpha;
@@ -178,13 +205,14 @@ class AlphaBetaThread extends Thread {
 	private byte player;
 	private long nodesVisited;
 	
-	public AlphaBetaThread(byte threadId, Oracle oracle, Board board,
+	public AlphaBetaThread(byte threadId, Oracle oracle, Board board, Movement lastMove,
 			AlphaBetaThreadEndEvent event, short depth, short alpha, short beta,
 			byte player) {
 		super();
 		this.threadId = threadId;
 		this.oracle = oracle;
 		this.board = board;
+		this.lastMove = lastMove;
 		this.event = event;
 		this.depth = depth;
 		this.alpha = alpha;
@@ -194,12 +222,12 @@ class AlphaBetaThread extends Thread {
 		this.nodesVisited = 0;
 	}
 	
-	private short alphaBeta(Board inputBoard, short depth, short alpha, short beta, byte player) {
+	private short alphaBeta(Board inputBoard, Movement lastMove, short depth, short alpha, short beta, byte player) {
 		
 		++nodesVisited;
 		
 		if ((depth == 0) || inputBoard.getWinner() != 0) {
-			return this.oracle.getProphecy(this.board, inputBoard, null, player);
+			return this.oracle.getProphecy(this.board, inputBoard, lastMove, player);
 		}
 		
 		List<Movement> moves = inputBoard.getPossibleMoves(player);
@@ -207,7 +235,7 @@ class AlphaBetaThread extends Thread {
 		short value = 0;
 		
 		for (Movement m : moves) {
-			value = (short) -alphaBeta(inputBoard.getBoardCopyAfterMove(m), (short) (depth-1), (short) (-beta), (short) (-alpha), (byte) (3 - player));
+			value = (short) -alphaBeta(inputBoard.getBoardCopyAfterMove(m), m, (short) (depth-1), (short) (-beta), (short) (-alpha), (byte) (3 - player));
 			if (value > alpha)
 				alpha = value;
 			if (alpha >= beta) {
@@ -218,7 +246,7 @@ class AlphaBetaThread extends Thread {
 	}
 	
 	public void run() {
-		short value = (short) -alphaBeta(board, depth, alpha, beta, player);
+		short value = (short) -alphaBeta(board, lastMove, depth, alpha, beta, player);
 		event.onThreadEnd(threadId, value);
 		event.onThreadEndCountNodes(this.nodesVisited);
 	}
