@@ -14,6 +14,9 @@ public class HumanPlayer extends Player {
 
 	public HumanPlayer(byte id, int delay) {
 		super(id, 0);
+		
+		this.statsMovesNum = 1;
+		this.statsVisitedNodes = 1;
 	}
 
 

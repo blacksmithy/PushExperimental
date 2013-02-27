@@ -14,6 +14,9 @@ public class GreedyPlayer extends Player {
 	
 	public GreedyPlayer(byte id, int delay) {
 		super(id, delay);
+		
+		this.statsMovesNum = 1;
+		this.statsVisitedNodes = 1;
 	}
 
 	@Override

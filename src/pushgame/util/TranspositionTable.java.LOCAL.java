@@ -12,8 +12,6 @@ public class TranspositionTable {
 	public TranspositionTable() {
 		map = new HashMap<Long, Transposition>(1000000);
 		//purgatory = new HashSet<Long>();
-		map = new HashMap<Long, Transposition>(20000);
-		purgatory = new HashSet<Long>();
 	}
 	
 	public Transposition get(long hash) {		
