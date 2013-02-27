@@ -293,6 +293,7 @@ public class GameWindow extends JFrame implements ActionListener, WindowListener
 			game.hold();
 			
 			JFileChooser fs=new JFileChooser();
+			fs.setApproveButtonText("Save");
 			int returnVal = fs.showOpenDialog(this);
 
 	        if (returnVal == JFileChooser.APPROVE_OPTION) {

@@ -103,7 +103,7 @@ public class MainMenu extends JFrame implements ActionListener
 		}
 		else if (src == help)
 		{
-			new SettingsWindow();
+			new HelpWindow();
 		}
 		else if (src == exit)
 		{
