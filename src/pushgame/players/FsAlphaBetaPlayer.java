@@ -7,7 +7,7 @@ import java.util.List;
 import pushgame.logic.Board;
 import pushgame.logic.Movement;
 import pushgame.oracle.Oracle;
-import pushgame.oracle.SymmetricDistancesOracle;
+import pushgame.oracle.SymmetricWeightedOracle;
 import pushgame.util.AlphaBetaThreadEndEvent;
 import pushgame.util.GameConfig;
 import pushgame.util.MovementComparator;
@@ -26,8 +26,8 @@ public class FsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent
 	
 	public FsAlphaBetaPlayer(byte id, int delay) {
 		super(id, delay);
-		oracle = new SymmetricDistancesOracle();
-		oracle2 = new SymmetricDistancesOracle();
+		oracle = new SymmetricWeightedOracle();
+		oracle2 = new SymmetricWeightedOracle();
 		threadReturn = new short[2];
 		threads = new FsAlphaBetaThread[2];
 	}
@@ -149,7 +149,6 @@ public class FsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent
 					//System.out.println("i: " + i + " NOWA ALFA: " + alpha);
 			}
 			if (alpha >= beta) {
-			//	System.out.println("ODCIĘCIE!!!!!!!!!");
 				break;
 			}
 			if (threadReturn[0] > decisionValue)
@@ -160,10 +159,8 @@ public class FsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent
 			if (! forceOneThread && (i + 1 < moves.size())) {
 				if (threadReturn[1] > alpha) {
 					alpha = threadReturn[1];
-						//System.out.println("i: " + i + " NOWA ALFA: " + alpha);
 				}
 				if (alpha >= beta) {
-					//System.out.println("ODCIĘCIE!!!!!!!!!");
 					break;
 				}
 				if (threadReturn[1] > decisionValue) {

@@ -108,8 +108,8 @@ public class Game {
 			}
 			if(!active) {return;}
 		}
-		System.out.println("P1 nodes(" + player1.getStatsVisitedNodes() + ") \t moves(" + player1.getStatsMovesNum() + ") \t ratio(" + (player1.getStatsVisitedNodes()/player1.getStatsMovesNum()) + ")");
-		System.out.println("P2 nodes(" + player2.getStatsVisitedNodes() + ") \t moves(" + player2.getStatsMovesNum() + ") \t ratio(" + (player2.getStatsVisitedNodes()/player2.getStatsMovesNum()) + ")");
+	//	System.out.println("P1 nodes(" + player1.getStatsVisitedNodes() + ") \t moves(" + player1.getStatsMovesNum() + ") \t ratio(" + (player1.getStatsVisitedNodes()/player1.getStatsMovesNum()) + ")");
+	//	System.out.println("P2 nodes(" + player2.getStatsVisitedNodes() + ") \t moves(" + player2.getStatsMovesNum() + ") \t ratio(" + (player2.getStatsVisitedNodes()/player2.getStatsMovesNum()) + ")");
 		
 		endGame();
 		System.out.println("And the winner is... PLAYER" + winner + "!");

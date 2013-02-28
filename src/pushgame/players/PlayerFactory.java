@@ -13,7 +13,7 @@ public class PlayerFactory
 	static final public String RANDOM_AI="AI losowy";
 	static final public String FS_ALPHA_BETA = "AI alfa-beta FS";
 	static final public String FS_ALPHA_BETA_TT = "AI alfa-beta FS TT";
-	static final public String WEIGHTED_AB = "test wieghted";
+	static final public String WEIGHTED_AB = "test weighted";
 	static final public String C_STAR = "C* + TT";
 	static final public String MTD = "MTD(f) + TT";
 	
@@ -36,11 +36,6 @@ public class PlayerFactory
 		cb.addItem(ALPHA_BETA_AI);
 		cb.addItem(FS_ALPHA_BETA);
 		cb.addItem(FS_ALPHA_BETA_TT);
-		cb.addItem(C_STAR);
-		cb.addItem(MTD);
-		cb.addItem(WEIGHTED_AB);
-//		cb.addItem(ELF_TEST);
-//		cb.addItem(BLS_TEST);
 	}
 	
 	static public void loadDepths(int aiID,String algo,JComboBox<Integer> cb)

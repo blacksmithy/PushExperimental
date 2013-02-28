@@ -7,13 +7,13 @@ import java.util.List;
 import pushgame.logic.Board;
 import pushgame.logic.Movement;
 import pushgame.oracle.Oracle;
-import pushgame.oracle.SymmetricDistancesOracle;
 import pushgame.oracle.SymmetricWeightedOracle;
 import pushgame.util.AlphaBetaThreadEndEvent;
 import pushgame.util.GameConfig;
 import pushgame.util.MovementComparator;
 
-public class TestAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
+public class TestAlphaBetaPlayer extends Player implements
+		AlphaBetaThreadEndEvent {
 
 	private Oracle oracle;
 	private Oracle oracle2;
@@ -23,11 +23,9 @@ public class TestAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 	private int firstMoves = 0;
 	private int firstMovesNum = 2;
 	private boolean sortEnable = true;
-	
+
 	public TestAlphaBetaPlayer(byte id, int delay) {
 		super(id, delay);
-		//oracle = new SymmetricDistancesOracle();
-		//oracle2 = new SymmetricDistancesOracle();
 		oracle = new SymmetricWeightedOracle();
 		oracle2 = new SymmetricWeightedOracle();
 		threadReturn = new short[2];
@@ -38,19 +36,17 @@ public class TestAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 	public Movement makeMove(Board board) {
 		short depth = 0;
 		if (id == 1)
-			depth = GameConfig.getInstance().getAi1Depth();//6;
+			depth = GameConfig.getInstance().getAi1Depth();// 6;
 		else
 			depth = GameConfig.getInstance().getAi2Depth();
-		
-		
-		
+
 		Movement decision = null;
 		short decisionValue = Short.MIN_VALUE;
 		short alpha = Short.MIN_VALUE + 2;
 		short beta = Short.MAX_VALUE - 1;
-		
+
 		++statsMovesNum;
-		
+
 		/* ***************** Generating possible moves ***************** */
 
 		List<Movement> moves = board.getPossibleMoves(id);
@@ -123,43 +119,48 @@ public class TestAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 		}
 
 		/* ************************************************************* */
-		
+
 		int iterStep = 2;
 		if (forceOneThread) {
 			iterStep = 1;
 		}
-		
+
 		for (int i = 0; i < moves.size(); i += iterStep) {
 			System.out.println("->" + i);
-			
-			threads[0] = new AlphaBetaThread((byte) 0, oracle, board.getBoardCopyAfterMove(moves.get(i)), moves.get(i), this, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
+
+			threads[0] = new AlphaBetaThread((byte) 0, oracle,
+					board.getBoardCopyAfterMove(moves.get(i)), moves.get(i),
+					this, (short) (depth - 1), (short) (-beta),
+					(short) (-alpha), (byte) (3 - id));
 			threads[0].run();
-			if (! forceOneThread && (i + 1 < moves.size())) {
-				threads[1] = new AlphaBetaThread((byte) 1, oracle2, board.getBoardCopyAfterMove(moves.get(i+1)), moves.get(i+1), this, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
+			if (!forceOneThread && (i + 1 < moves.size())) {
+				threads[1] = new AlphaBetaThread((byte) 1, oracle2,
+						board.getBoardCopyAfterMove(moves.get(i + 1)),
+						moves.get(i + 1), this, (short) (depth - 1),
+						(short) (-beta), (short) (-alpha), (byte) (3 - id));
 				threads[1].run();
 			}
-			
+
 			try {
 				threads[0].join();
-				if (! forceOneThread && (i + 1 < moves.size())) {
+				if (!forceOneThread && (i + 1 < moves.size())) {
 					threads[1].join();
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			
+
 			if (threadReturn[0] > alpha) {
 				alpha = threadReturn[0];
 			}
 			if (alpha >= beta) {
 				break;
 			}
-			if (threadReturn[0] > decisionValue)
-			{
+			if (threadReturn[0] > decisionValue) {
 				decisionValue = threadReturn[0];
 				decision = moves.get(i);
 			}
-			if (! forceOneThread && (i + 1 < moves.size())) {
+			if (!forceOneThread && (i + 1 < moves.size())) {
 				if (threadReturn[1] > alpha) {
 					alpha = threadReturn[1];
 				}
@@ -168,10 +169,10 @@ public class TestAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 				}
 				if (threadReturn[1] > decisionValue) {
 					decisionValue = threadReturn[1];
-					decision = moves.get(i+1);
+					decision = moves.get(i + 1);
 				}
 			}
-			
+
 			if (decision == null) {
 				System.err.println("DECISION ERROR!");
 				System.exit(-1);
@@ -184,12 +185,12 @@ public class TestAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 
 	@Override
 	public void onThreadEnd(byte threadId, short value) {
-		threadReturn[threadId] = value;		
+		threadReturn[threadId] = value;
 	}
 
 	@Override
 	public void onThreadEndCountNodes(long nodes) {
-		this.statsVisitedNodes += nodes;		
+		this.statsVisitedNodes += nodes;
 	}
 
 }

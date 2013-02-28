@@ -5,9 +5,6 @@ import pushgame.logic.Movement;
 
 public class SymmetricDistancesOracle extends Oracle {
 
-	//private static final short WINNER_BONUS = 100;
-	private static final short FORWARD_BONUS = 50;
-	
 	public SymmetricDistancesOracle() {}
 
 	@Override

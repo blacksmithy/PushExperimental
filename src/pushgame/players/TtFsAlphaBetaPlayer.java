@@ -7,29 +7,30 @@ import java.util.List;
 import pushgame.logic.Board;
 import pushgame.logic.Movement;
 import pushgame.oracle.Oracle;
-import pushgame.oracle.SymmetricDistancesOracle;
+import pushgame.oracle.SymmetricWeightedOracle;
 import pushgame.util.AlphaBetaThreadEndEvent;
 import pushgame.util.GameConfig;
 import pushgame.util.MovementComparator;
 import pushgame.util.Transposition;
 import pushgame.util.TranspositionTable;
 
-public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEvent {
+public class TtFsAlphaBetaPlayer extends Player implements
+		AlphaBetaThreadEndEvent {
 
 	private Oracle oracle;
 	private Oracle oracle2;
 	private short[] threadReturn;
 	private TtFsAlphaBetaThread[] threads;
-	private boolean forceOneThread = true;	
-	
+	private boolean forceOneThread = true;
+
 	private int firstMoves = 0;
 	private int firstMovesNum = 2;
 	private boolean sortEnable = true;
-	
+
 	public TtFsAlphaBetaPlayer(byte id, int delay) {
 		super(id, delay);
-		oracle = new SymmetricDistancesOracle();
-		oracle2 = new SymmetricDistancesOracle();
+		oracle = new SymmetricWeightedOracle();
+		oracle2 = new SymmetricWeightedOracle();
 		threadReturn = new short[2];
 		threads = new TtFsAlphaBetaThread[2];
 	}
@@ -38,20 +39,20 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 	public Movement makeMove(Board board) {
 		short depth = 0;
 		if (id == 1)
-			depth = GameConfig.getInstance().getAi1Depth();//6;
+			depth = GameConfig.getInstance().getAi1Depth();// 6;
 		else
 			depth = GameConfig.getInstance().getAi2Depth();
-		
+
 		TranspositionTable tt1 = new TranspositionTable();
 		TranspositionTable tt2 = new TranspositionTable();
-		
+
 		Movement decision = null;
 		short decisionValue = Short.MIN_VALUE;
 		short alpha = Short.MIN_VALUE + 2;
 		short beta = Short.MAX_VALUE - 1;
-		
+
 		++statsMovesNum;
-		
+
 		/* ***************** Generating possible moves ***************** */
 
 		List<Movement> moves = board.getPossibleMoves(id);
@@ -124,44 +125,48 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 		}
 
 		/* ************************************************************* */
-		
+
 		int iterStep = 2;
 		if (forceOneThread) {
 			iterStep = 1;
 		}
-		
+
 		for (int i = 0; i < moves.size(); i += iterStep) {
 			System.out.println("->" + i);
-			
-			threads[0] = new TtFsAlphaBetaThread((byte) 0, oracle, board.getBoardCopyAfterMove(moves.get(i)), this, tt1, tt2, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
+
+			threads[0] = new TtFsAlphaBetaThread((byte) 0, oracle,
+					board.getBoardCopyAfterMove(moves.get(i)), this, tt1, tt2,
+					(short) (depth - 1), (short) (-beta), (short) (-alpha),
+					(byte) (3 - id));
 			threads[0].run();
-			if (! forceOneThread && (i + 1 < moves.size())) {
-				threads[1] = new TtFsAlphaBetaThread((byte) 1, oracle2, board.getBoardCopyAfterMove(moves.get(i+1)), this, tt1, tt2, (short) (depth - 1), (short) (-beta), (short) (-alpha), (byte) (3 - id));
+			if (!forceOneThread && (i + 1 < moves.size())) {
+				threads[1] = new TtFsAlphaBetaThread((byte) 1, oracle2,
+						board.getBoardCopyAfterMove(moves.get(i + 1)), this,
+						tt1, tt2, (short) (depth - 1), (short) (-beta),
+						(short) (-alpha), (byte) (3 - id));
 				threads[1].run();
 			}
-			
+
 			try {
 				threads[0].join();
-				if (! forceOneThread && (i + 1 < moves.size())) {
+				if (!forceOneThread && (i + 1 < moves.size())) {
 					threads[1].join();
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			
+
 			if (threadReturn[0] > alpha) {
 				alpha = threadReturn[0];
 			}
 			if (alpha >= beta) {
-			//	System.out.println("ODCIĘCIE!!!!!!!!!");
 				break;
 			}
-			if (threadReturn[0] > decisionValue)
-			{
+			if (threadReturn[0] > decisionValue) {
 				decisionValue = threadReturn[0];
 				decision = moves.get(i);
 			}
-			if (! forceOneThread && (i + 1 < moves.size())) {
+			if (!forceOneThread && (i + 1 < moves.size())) {
 				if (threadReturn[1] > alpha) {
 					alpha = threadReturn[1];
 				}
@@ -170,30 +175,30 @@ public class TtFsAlphaBetaPlayer extends Player implements AlphaBetaThreadEndEve
 				}
 				if (threadReturn[1] > decisionValue) {
 					decisionValue = threadReturn[1];
-					decision = moves.get(i+1);
+					decision = moves.get(i + 1);
 				}
 			}
-			
+
 			if (decision == null) {
 				System.err.println("DECISION ERROR!");
 				System.exit(-1);
 			}
 
 		}
-		
-		System.out.println("TT:" + tt1.getSize() + tt2.getSize());
+
+		// System.out.println("TT:" + tt1.getSize() + tt2.getSize());
 
 		return decision;
 	}
 
 	@Override
 	public void onThreadEnd(byte threadId, short value) {
-		threadReturn[threadId] = value;		
+		threadReturn[threadId] = value;
 	}
-	
+
 	@Override
 	public void onThreadEndCountNodes(long nodes) {
-		this.statsVisitedNodes += nodes;		
+		this.statsVisitedNodes += nodes;
 	}
 
 }
@@ -209,11 +214,12 @@ class TtFsAlphaBetaThread extends Thread {
 	private short alpha;
 	private short beta;
 	private byte player;
-	
+
 	private long nodesVisited;
-	
+
 	public TtFsAlphaBetaThread(byte threadId, Oracle oracle, Board board,
-			AlphaBetaThreadEndEvent event, TranspositionTable tt1, TranspositionTable tt2, short depth, short alpha, short beta,
+			AlphaBetaThreadEndEvent event, TranspositionTable tt1,
+			TranspositionTable tt2, short depth, short alpha, short beta,
 			byte player) {
 		super();
 		this.threadId = threadId;
@@ -226,29 +232,30 @@ class TtFsAlphaBetaThread extends Thread {
 		this.alpha = alpha;
 		this.beta = beta;
 		this.player = player;
-		
+
 		this.nodesVisited = 0;
 	}
-	
-	private short alphaBeta(Board inputBoard, short depth, short alpha, short beta, byte player) {
-		
+
+	private short alphaBeta(Board inputBoard, short depth, short alpha,
+			short beta, byte player) {
+
 		++nodesVisited;
-		
+
 		if ((depth == 0) || inputBoard.getWinner() != 0) {
-			return this.oracle.getProphecy(this.board, inputBoard, null, player);
+			return this.oracle
+					.getProphecy(this.board, inputBoard, null, player);
 		}
-		
+
 		List<Movement> moves = null;
 		Transposition t = null;
 		short prevAlpha = alpha;
 
 		if (player == 1) {
 			t = tt1.get(inputBoard.getHash());
-		}
-		else {
+		} else {
 			t = tt2.get(inputBoard.getHash());
 		}
-		
+
 		if (t != null) {
 			if (t.getDepth() >= depth) {
 				if (t.getType() == Transposition.VALUE_LOWER)
@@ -261,10 +268,10 @@ class TtFsAlphaBetaThread extends Thread {
 				}
 			}
 			if (alpha >= beta) // cutoff
-				return t.getValue();			
+				return t.getValue();
 		}
 		moves = inputBoard.getPossibleMoves(player);
-		
+
 		if (t != null) {
 			int idx = moves.indexOf(t.getNextBest());
 			if (idx != -1 && idx != 0) {
@@ -273,16 +280,16 @@ class TtFsAlphaBetaThread extends Thread {
 		}
 
 		short best = Short.MIN_VALUE;
-		boolean bestFound = false;
 		Movement nextBest = null;
 		short value = 0;
-		
+
 		for (Movement m : moves) {
-			value = (short) -alphaBeta(inputBoard.getBoardCopyAfterMove(m), (short) (depth-1), (short) (-beta), (short) (-alpha), (byte) (3 - player));
+			value = (short) -alphaBeta(inputBoard.getBoardCopyAfterMove(m),
+					(short) (depth - 1), (short) (-beta), (short) (-alpha),
+					(byte) (3 - player));
 			if (value > best) {
 				best = value;
 				nextBest = m;
-				bestFound = true;
 			}
 			if (best >= beta) {
 				break;
@@ -290,24 +297,21 @@ class TtFsAlphaBetaThread extends Thread {
 			if (best > alpha)
 				alpha = best;
 		}
-		
-		if (bestFound) {
-			if (player == 1) {
-				//if (t == null || depth < t.getDepth() || (depth == t.getDepth() && best > t.getValue()))
-					tt1.put(new Transposition(best, depth, prevAlpha, beta, nextBest), inputBoard.getHash());
-			}
-			else {
-				//if (t == null || depth < t.getDepth() || (depth == t.getDepth() && best > t.getValue()))
-					tt2.put(new Transposition(best, depth, prevAlpha, beta, nextBest), inputBoard.getHash());
-			}
+
+		if (player == 1) {
+			tt1.put(new Transposition(best, depth, prevAlpha, beta, nextBest),
+					inputBoard.getHash());
+		} else {
+			tt2.put(new Transposition(best, depth, prevAlpha, beta, nextBest),
+					inputBoard.getHash());
 		}
 		return best;
 	}
-	
+
 	public void run() {
 		short value = (short) -alphaBeta(board, depth, alpha, beta, player);
 		event.onThreadEnd(threadId, value);
 		event.onThreadEndCountNodes(this.nodesVisited);
 	}
-	
+
 }

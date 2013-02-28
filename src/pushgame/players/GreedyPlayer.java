@@ -4,8 +4,8 @@ import java.util.List;
 
 import pushgame.logic.Board;
 import pushgame.logic.Movement;
-import pushgame.oracle.DistancesOracle;
 import pushgame.oracle.Oracle;
+import pushgame.oracle.WeightedOracle;
 
 public class GreedyPlayer extends Player {
 
@@ -16,7 +16,7 @@ public class GreedyPlayer extends Player {
 		super(id, delay);
 		
 		this.statsMovesNum = 1;
-		this.statsVisitedNodes = 1;
+		this.statsVisitedNodes = 0;
 	}
 
 	@Override
@@ -24,10 +24,13 @@ public class GreedyPlayer extends Player {
 		Movement decision = null;
 		List<Movement> moves = board.getPossibleMoves(id);
 		
+		statsVisitedNodes += moves.size();
+		statsMovesNum++;
+		
 		System.out.println("|<0, i>| -> " + moves.size());
 		
 		List<Movement> lockPreventionMoves = null;
-		Oracle oracle = new DistancesOracle();
+		Oracle oracle = new WeightedOracle();
 		decision = moves.get(0);
 		
 		// 7 | 0 | 1

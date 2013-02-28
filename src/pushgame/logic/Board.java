@@ -1207,7 +1207,6 @@ public class Board implements Serializable {
 	
 	
 	public boolean hasForwardMoves(byte player) {
-		List<Movement> moves = new ArrayList<Movement>();
 		byte temp = 0;
 		byte chain = 0;
 		byte empty = 0;
