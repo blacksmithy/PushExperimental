@@ -13,15 +13,12 @@ public class PlayerFactory
 	static final public String RANDOM_AI="AI losowy";
 	static final public String FS_ALPHA_BETA = "AI alfa-beta FS";
 	static final public String FS_ALPHA_BETA_TT = "AI alfa-beta FS TT";
-	static final public String WEIGHTED_AB = "test weighted";
-	static final public String C_STAR = "C* + TT";
-	static final public String MTD = "MTD(f) + TT";
 	
 	
-	static public String algoAI1=RANDOM_AI;
+	static public String algoAI1=HUMAN_PLAYER;
 	static public Integer depthAI1=4;
-	static public String algoAI2=HUMAN_PLAYER;
-	static public Integer depthAI2=6;
+	static public String algoAI2=GREEDY_AI;
+	static public Integer depthAI2=4;
 
 	static public Integer delay1=250;
 	static public Integer delay2=250;
@@ -40,7 +37,7 @@ public class PlayerFactory
 	
 	static public void loadDepths(int aiID,String algo,JComboBox<Integer> cb)
 	{
-		if(algo==ALPHA_BETA_AI || algo == FS_ALPHA_BETA || algo == FS_ALPHA_BETA_TT || algo == C_STAR || algo == MTD || algo == WEIGHTED_AB)
+		if(algo==ALPHA_BETA_AI || algo == FS_ALPHA_BETA || algo == FS_ALPHA_BETA_TT)
 		{
 			cb.removeAllItems();
 			cb.addItem(1);
@@ -135,18 +132,6 @@ public class PlayerFactory
 		else if(ai == FS_ALPHA_BETA_TT)
 		{
 			result = new TtFsAlphaBetaPlayer(id, delay);
-		}
-		else if(ai == C_STAR)
-		{
-			result = new CstarPlayer(id, delay);
-		}
-		else if(ai == MTD)
-		{
-			result = new MtdPlayer(id, delay);
-		}
-		else if(ai==WEIGHTED_AB)
-		{
-			result = new TestAlphaBetaPlayer(id, delay);
 		}
 		return result;
 	}

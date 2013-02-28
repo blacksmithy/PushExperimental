@@ -48,7 +48,10 @@ public class HelpWindow extends JFrame
 		JTextPane pane3 = new JTextPane();
 		pane3.setEditable(false);
 		String text3="";
-		text3+= "Nowa gra – powoduje utworzenie nowego okna gry, zgodnie z ustawieniami określonymi w zakładce „wybór graczy”.\n\n" +
+		text3+= "Nowa gra – powoduje utworzenie nowego okna gry, zgodnie z ustawieniami określonymi w zakładce „wybór graczy”.\n" +
+				"Jeżeli gracz wykonuje ruch, to należy zaznaczyć prawym klawiszem myszy pionek który chcemy przesunąć, " +
+				"wtedy podświetlą się pola na które możemy wykonać ruch. " +
+				"Aby wykonać ruch należy kliknąć lewym klawiszem myszy na podświeltone pole docelowe.\n\n" +
 				"Załaduj grę – pozwala na otwarcie pliku z wcześniej zapisaną grą.\n\n" +
 				"Ustaw planszę – pozwala na ręczne ustawienie planszy oraz zapisanie jej do pliku w celu późniejszego odczytania.\n\n" +
 				"Wybór graczy – pozwala wybrać typ graczy (algorytm w przypadku AI), kolor pionów oraz opóźnienie z jakim wykonywane jest polecenie.";
